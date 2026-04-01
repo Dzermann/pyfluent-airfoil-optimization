@@ -1,0 +1,7 @@
+- ansys-fluent-core # obviously
+- pandas # used for reading dataframes
+- numpy
+- matplotlib
+- scipy
+- imageio # for making gifs
+- Pillow

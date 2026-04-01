@@ -1,0 +1,368 @@
+[2026-02-18 00:39:06] --------------------------------------------------------------------------------------------
+[2026-02-18 00:39:06] LOADING NACA_0012_final
+[2026-02-18 00:39:06] --------------------------------------------------------------------------------------------
+[2026-02-18 00:39:06] PASS: Timer On
+[2026-02-18 00:39:06] Launching fluent session...
+[2026-02-18 00:39:25] PASS: Fluent session launched
+[2026-02-18 00:39:25] Importing geometry...
+[2026-02-18 00:39:42] Importing one geom object per program-controlled and one zone per body ...
+[2026-02-18 00:39:43]     C:\\Program Files\\ANSYS Inc\\v252\\commonfiles\\CPython\\3_10\\winx64\\Release\\python\\..\\Ansys\\TGrid\\CADReaders.py started by O on DESKTOP-LAE97O5 winx64 on Wed Feb 18 00:39:43 2026
+[2026-02-18 00:39:43]     using Python 3.10.16 (remotes/origin/14d18b8e2626165312e076b70cf60f0faa8db8d5-dirty:14d18b8e, May 20 2) [MSC v.1942 64 bit (AMD64)]
+[2026-02-18 00:39:43]     using Ansys.Meshing.FieldMesher build Jun 13 2025 15:24:50
+[2026-02-18 00:39:43]     running ANSYS TGrid CADToTGridConverter ...
+[2026-02-18 00:39:43]     setting up parameters ...
+[2026-02-18 00:39:43]     setting up parameters done.
+[2026-02-18 00:39:43]     running conversion ...
+[2026-02-18 00:39:43]     converting 1 file(s) from Workbench to FLTG using output path 'C:\\Users\\99556\\Desktop\\Python Files\\FM_DESKTOP-LAE97O5_7540/out1771375170.34977540.tgf'
+[2026-02-18 00:39:43]     converting file 'NACA_0012_.scdocx' (1 of 1) from Workbench to FLTG using output path 'C:\\Users\\99556\\Desktop\\Python Files\\FM_DESKTOP-LAE97O5_7540'
+[2026-02-18 00:39:43]     importing data ...
+[2026-02-18 00:39:43]     importing meshing model from PartMgr from file 'C:/Users/99556/Desktop/Meshing/NACA_0012\\final_3906\\NACA_0012_.scdocx' ...
+[2026-02-18 00:39:43]     setting enclosure and symmetry processing to False
+[2026-02-18 00:39:43]     setting transfer named selections to True
+[2026-02-18 00:39:43]     setting named selection prefixes to ''
+[2026-02-18 00:39:43]     setting mixed import resolution type to 'SolidAndSurface'
+[2026-02-18 00:39:43]     setting target application to 'FluentMeshing'
+[2026-02-18 00:39:43]     attaching to assembly ...
+[2026-02-18 00:40:01]     attaching to assembly done in 18.218 [s]
+[2026-02-18 00:40:01]     processing assembly 'C:\\Users\\99556\\Desktop\\Meshing\\NACA_0012\\final_3906\\NACA_0012_.scdocx' with ID 1 and reference key '<?xml version="1.0" encoding="utf-16"?>
+[2026-02-18 00:40:01]     <IdTable xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+[2026-02-18 00:40:01]       <Table>
+[2026-02-18 00:40:01]         <Entry>
+[2026-02-18 00:40:01]           <AssemblyVersionInfo>
+[2026-02-18 00:40:01]             <AssemblySavedVersion>2147483647</AssemblySavedVersion>
+[2026-02-18 00:40:01]             <AssemblySavedBuildDate>2147483647</AssemblySavedBuildDate>
+[2026-02-18 00:40:01]             <IsLegacyLabel>false</IsLegacyLabel>
+[2026-02-18 00:40:01]           </AssemblyVersionInfo>
+[2026-02-18 00:40:01]           <Text>~sE6b21355e-a353-46fa-b531-f2fc3a9eb100.2_#</Text>
+[2026-02-18 00:40:01]           <Id>10000</Id>
+[2026-02-18 00:40:01]           <IsExploded>false</IsExploded>
+[2026-02-18 00:40:01]         </Entry>
+[2026-02-18 00:40:01]       </Table>
+[2026-02-18 00:40:01]       <AssemblyVersionInfo>
+[2026-02-18 00:40:01]         <AssemblySavedVersion>2147483647</AssemblySavedVersion>
+[2026-02-18 00:40:01]         <AssemblySavedBuildDate>2147483647</AssemblySavedBuildDate>
+[2026-02-18 00:40:01]         <IsLegacyLabel>false</IsLegacyLabel>
+[2026-02-18 00:40:01]       </AssemblyVersionInfo>
+[2026-02-18 00:40:01]     </IdTable>'
+[2026-02-18 00:40:01]     length unit = [m]
+[2026-02-18 00:40:01]     processing part 'NACA_0012_' with ID 3
+[2026-02-18 00:40:01]     processing named selection 'sym1'
+[2026-02-18 00:40:01]     processing named selection 'sym2'
+[2026-02-18 00:40:01]     processing named selection 'farfield'
+[2026-02-18 00:40:01]     processing named selection 'lower'
+[2026-02-18 00:40:01]     processing named selection 'upper'
+[2026-02-18 00:40:01]     processing data ...
+[2026-02-18 00:40:01]     removing named collections of entities ...
+[2026-02-18 00:40:01]     removing named collections of entities stopped, no named collections selected.
+[2026-02-18 00:40:01]     analyzing feature edges ...
+[2026-02-18 00:40:01]     detecting feature edges, feature angle = 40 [deg] ...
+[2026-02-18 00:40:01]         Data information
+[2026-02-18 00:40:01]             Meshing model
+[2026-02-18 00:40:01]                 Attributes:
+[2026-02-18 00:40:01]                     'LengthUnit': '[m]'
+[2026-02-18 00:40:01]                 Entity summary:
+[2026-02-18 00:40:01]                     Collection: 5
+[2026-02-18 00:40:01]                     Component : 2
+[2026-02-18 00:40:01]                     Body      : 1
+[2026-02-18 00:40:01]                     Shell     : 1
+[2026-02-18 00:40:01]                     Face      : 6
+[2026-02-18 00:40:01]                     Loop      : 8
+[2026-02-18 00:40:01]                     Edge      : 12
+[2026-02-18 00:40:01]                     Vertex    : 8
+[2026-02-18 00:40:01]                     Surface   : 6
+[2026-02-18 00:40:01]                     Curve     : 12
+[2026-02-18 00:40:01]                 Tessellation summary:
+[2026-02-18 00:40:01]                     Face facets  : 560
+[2026-02-18 00:40:01]                     Edge segments: 284
+[2026-02-18 00:40:01]                 Bounding box:
+[2026-02-18 00:40:01]                     (-9.999887466430664, -15, -0.05000000074505806) x (20, 15, 0.05000000074505806)
+[2026-02-18 00:40:01]                 Assembly component hierarchy:
+[2026-02-18 00:40:01]                     'C:\\Users\\99556\\Desktop\\Meshing\\NACA_0012\\final_3906\\NACA_0012_.scdocx'
+[2026-02-18 00:40:01]                       'NACA_0012_'
+[2026-02-18 00:40:01]                 NamedCollections:
+[2026-02-18 00:40:01]                     'sym1'
+[2026-02-18 00:40:01]                     'sym2'
+[2026-02-18 00:40:01]                     'farfield'
+[2026-02-18 00:40:01]                     'lower'
+[2026-02-18 00:40:01]                     'upper'
+[2026-02-18 00:40:01]     exporting FLTG data to file 'C:\\Users\\99556\\Desktop\\Python Files\\FM_DESKTOP-LAE97O5_7540\\out1771375170.34977540.tgf' ...
+[2026-02-18 00:40:01]     writing face-based mesh file 'C:\\Users\\99556\\Desktop\\Python Files\\FM_DESKTOP-LAE97O5_7540\\out1771375170.34977540.tgf' ...
+[2026-02-18 00:40:01]     ======== Exported Data ========
+[2026-02-18 00:40:01]     Entity summary:
+[2026-02-18 00:40:01]         Object       : 1
+[2026-02-18 00:40:01]         Object region: 6
+[2026-02-18 00:40:01]         Zone         : 13
+[2026-02-18 00:40:01]     running conversion done.
+[2026-02-18 00:40:01]     running ANSYS TGrid CADToTGridConverter done.
+[2026-02-18 00:40:01]     ran ANSYS TGrid CADToTGridConverter in 18.313 [s]
+[2026-02-18 00:40:04] Reading "C:\Users\99556\Desktop\Python Files\FM_DESKTOP-LAE97O5_7540/out1771375170.34977540.tgf"...
+[2026-02-18 00:40:04] Reading "C:\Users\99556\Desktop\Python Files\FM_DESKTOP-LAE97O5_7540/out1771375170.34977540.tgf"...
+[2026-02-18 00:40:04] nodes: 560
+[2026-02-18 00:40:04] edges: 284
+[2026-02-18 00:40:04] faces: 560
+[2026-02-18 00:40:04] cells: 0
+[2026-02-18 00:40:04] generating pointers...done.
+[2026-02-18 00:40:04] extracting boundary entities...
+[2026-02-18 00:40:04]  560 boundary nodes.
+[2026-02-18 00:40:04]  560 boundary faces.
+[2026-02-18 00:40:04]  5 boundary face zones.
+[2026-02-18 00:40:04] done.
+[2026-02-18 00:40:05] analyzing boundary connectivity...done.
+[2026-02-18 00:40:17] using plugIn session Discovery[26688]
+[2026-02-18 00:40:18] ---------------- Import of NACA_0012_, consisting of one single part/object , complete. 
+[2026-02-18 00:40:18] ---------------- Import complete in  0.80 minutes.
+[2026-02-18 00:40:18] PASS: Geometry imported
+[2026-02-18 00:40:18] Adding local sizing to upper/lower...
+[2026-02-18 00:40:24] >>> 
+[2026-02-18 00:40:24] ---------------- A local size of 0.01 was added to airfoil_max
+[2026-02-18 00:40:24] PASS: Local sizing added to upper/lower
+[2026-02-18 00:40:24] Generating the surface mesh...
+[2026-02-18 00:40:41] Writing "C:\Users\99556\Desktop\Python Files\FM_DESKTOP-LAE97O5_7540\TaskObject3.msh.h5" ...
+[2026-02-18 00:40:41] writing 1 node zones
+[2026-02-18 00:40:41] writing 8 edge zones 
+[2026-02-18 00:40:41] writing 5 face zones 
+[2026-02-18 00:40:41] writing node curvature data
+[2026-02-18 00:40:42] done.
+[2026-02-18 00:40:42] ---------------- The Global Min size was adjusted to 8e-05 
+[2026-02-18 00:40:42]     processing size functions/scoped sizing to create Size Field...
+[2026-02-18 00:41:25] Writing "C:\Users\99556\Desktop\Python Files\FM_DESKTOP-LAE97O5_7540\NACA_0012_.sf"...
+[2026-02-18 00:41:25] Writing "C:\Users\99556\Desktop\Python Files\FM_DESKTOP-LAE97O5_7540\NACA_0012_.sf"...
+[2026-02-18 00:41:44] Done.
+[2026-02-18 00:41:44] Importing one mesh object per program-controlled and one zone per body ...
+[2026-02-18 00:41:44]     C:\\Program Files\\ANSYS Inc\\v252\\commonfiles\\CPython\\3_10\\winx64\\Release\\python\\..\\Ansys\\TGrid\\CADReaders.py started by O on DESKTOP-LAE97O5 winx64 on Wed Feb 18 00:41:44 2026
+[2026-02-18 00:41:44]     using Python 3.10.16 (remotes/origin/14d18b8e2626165312e076b70cf60f0faa8db8d5-dirty:14d18b8e, May 20 2) [MSC v.1942 64 bit (AMD64)]
+[2026-02-18 00:41:44]     using Ansys.Meshing.FieldMesher build Jun 13 2025 15:24:50
+[2026-02-18 00:41:44]     running ANSYS TGrid CADToTGridConverter ...
+[2026-02-18 00:41:44]     setting up parameters ...
+[2026-02-18 00:41:44]     setting up parameters done.
+[2026-02-18 00:41:44]     running conversion ...
+[2026-02-18 00:41:44]     converting 1 file(s) from Workbench to FLTG using output path 'C:\\Users\\99556\\Desktop\\Python Files\\FM_DESKTOP-LAE97O5_7540/out1771375304.2475777540.tgf'
+[2026-02-18 00:41:44]     converting file 'NACA_0012_.scdocx.pmdb' (1 of 1) from Workbench to FLTG using output path 'C:\\Users\\99556\\Desktop\\Python Files\\FM_DESKTOP-LAE97O5_7540'
+[2026-02-18 00:41:44]     importing data ...
+[2026-02-18 00:41:44]     importing meshing model from PartMgr from file 'C:\\Users\\99556\\Desktop\\Python Files\\FM_DESKTOP-LAE97O5_7540\\\\NACA_0012_.scdocx.pmdb' ...
+[2026-02-18 00:41:44]     setting enclosure and symmetry processing to False
+[2026-02-18 00:41:44]     setting transfer named selections to True
+[2026-02-18 00:41:44]     setting named selection prefixes to ''
+[2026-02-18 00:41:44]     setting mixed import resolution type to 'SolidAndSurface'
+[2026-02-18 00:41:44]     setting target application to 'FluentMeshing'
+[2026-02-18 00:41:44]     initializing part manager from file ...
+[2026-02-18 00:41:44]     processing assembly 'C:\\Users\\99556\\Desktop\\Meshing\\NACA_0012\\final_3906\\NACA_0012_.scdocx' with ID 1 and reference key '<?xml version="1.0" encoding="utf-16"?>
+[2026-02-18 00:41:44]     <IdTable xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+[2026-02-18 00:41:44]       <Table>
+[2026-02-18 00:41:44]         <Entry>
+[2026-02-18 00:41:44]           <AssemblyVersionInfo>
+[2026-02-18 00:41:44]             <AssemblySavedVersion>2147483647</AssemblySavedVersion>
+[2026-02-18 00:41:44]             <AssemblySavedBuildDate>2147483647</AssemblySavedBuildDate>
+[2026-02-18 00:41:44]             <IsLegacyLabel>false</IsLegacyLabel>
+[2026-02-18 00:41:44]           </AssemblyVersionInfo>
+[2026-02-18 00:41:44]           <Text>~sE6b21355e-a353-46fa-b531-f2fc3a9eb100.2_#</Text>
+[2026-02-18 00:41:44]           <Id>10000</Id>
+[2026-02-18 00:41:44]           <IsExploded>false</IsExploded>
+[2026-02-18 00:41:44]         </Entry>
+[2026-02-18 00:41:44]       </Table>
+[2026-02-18 00:41:44]       <AssemblyVersionInfo>
+[2026-02-18 00:41:44]         <AssemblySavedVersion>2147483647</AssemblySavedVersion>
+[2026-02-18 00:41:44]         <AssemblySavedBuildDate>2147483647</AssemblySavedBuildDate>
+[2026-02-18 00:41:44]         <IsLegacyLabel>false</IsLegacyLabel>
+[2026-02-18 00:41:44]       </AssemblyVersionInfo>
+[2026-02-18 00:41:44]     </IdTable>'
+[2026-02-18 00:41:44]     length unit = [m]
+[2026-02-18 00:41:44]     processing part 'NACA_0012_' with ID 3
+[2026-02-18 00:41:44]     processing named selection 'sym1'
+[2026-02-18 00:41:44]     processing named selection 'sym2'
+[2026-02-18 00:41:44]     processing named selection 'farfield'
+[2026-02-18 00:41:44]     processing named selection 'lower'
+[2026-02-18 00:41:44]     processing named selection 'upper'
+[2026-02-18 00:41:44]     processing data ...
+[2026-02-18 00:41:44]     loading size function background grid from file 'C:\\Users\\99556\\Desktop\\Python Files\\FM_DESKTOP-LAE97O5_7540\\\\NACA_0012_.sf' ...
+[2026-02-18 00:41:44]     reading size function background grid file 'C:\\Users\\99556\\Desktop\\Python Files\\FM_DESKTOP-LAE97O5_7540\\\\NACA_0012_.sf' ...
+[2026-02-18 00:41:49]      Read 15677349 vertices
+[2026-02-18 00:41:54]     initializing size function background grid done in 9.901999999999999 [s]
+[2026-02-18 00:42:07]     tessellating 6 faces done in 12.381 [s]
+[2026-02-18 00:42:07]     removing named collections of entities ...
+[2026-02-18 00:42:07]     removing named collections of entities stopped, no named collections selected.
+[2026-02-18 00:42:07]     analyzing feature edges ...
+[2026-02-18 00:42:07]     detecting feature edges, feature angle = 40 [deg], secondary feature angle = 5 [deg] ...
+[2026-02-18 00:42:07]         Data information
+[2026-02-18 00:42:07]             Meshing model
+[2026-02-18 00:42:07]                 Attributes:
+[2026-02-18 00:42:07]                     'LengthUnit': '[m]'
+[2026-02-18 00:42:07]                 Entity summary:
+[2026-02-18 00:42:07]                     Collection: 5
+[2026-02-18 00:42:07]                     Component : 2
+[2026-02-18 00:42:07]                     Body      : 1
+[2026-02-18 00:42:07]                     Shell     : 1
+[2026-02-18 00:42:07]                     Face      : 6
+[2026-02-18 00:42:07]                     Loop      : 8
+[2026-02-18 00:42:07]                     Edge      : 12
+[2026-02-18 00:42:07]                     Vertex    : 8
+[2026-02-18 00:42:07]                     Surface   : 6
+[2026-02-18 00:42:07]                     Curve     : 12
+[2026-02-18 00:42:07]                 Tessellation summary:
+[2026-02-18 00:42:07]                     Face facets  : 272364
+[2026-02-18 00:42:07]                     Edge segments: 2315
+[2026-02-18 00:42:07]                 Bounding box:
+[2026-02-18 00:42:07]                     (-9.998815536499023, -15, -0.05000000074505806) x (20, 15, 0.05000000074505806)
+[2026-02-18 00:42:07]                 Assembly component hierarchy:
+[2026-02-18 00:42:07]                     'C:\\Users\\99556\\Desktop\\Meshing\\NACA_0012\\final_3906\\NACA_0012_.scdocx'
+[2026-02-18 00:42:07]                       'NACA_0012_'
+[2026-02-18 00:42:07]                 NamedCollections:
+[2026-02-18 00:42:07]                     'sym1'
+[2026-02-18 00:42:07]                     'sym2'
+[2026-02-18 00:42:07]                     'farfield'
+[2026-02-18 00:42:07]                     'lower'
+[2026-02-18 00:42:07]                     'upper'
+[2026-02-18 00:42:07]     exporting FLTG data to file 'C:\\Users\\99556\\Desktop\\Python Files\\FM_DESKTOP-LAE97O5_7540\\out1771375304.2475777540.tgf' ...
+[2026-02-18 00:42:07]     writing face-based mesh file 'C:\\Users\\99556\\Desktop\\Python Files\\FM_DESKTOP-LAE97O5_7540\\out1771375304.2475777540.tgf' ...
+[2026-02-18 00:42:07]     ======== Exported Data ========
+[2026-02-18 00:42:07]     Entity summary:
+[2026-02-18 00:42:07]         Object       : 1
+[2026-02-18 00:42:07]         Object region: 6
+[2026-02-18 00:42:07]         Zone         : 13
+[2026-02-18 00:42:07]     running conversion done.
+[2026-02-18 00:42:07]     running ANSYS TGrid CADToTGridConverter done.
+[2026-02-18 00:42:07]     ran ANSYS TGrid CADToTGridConverter in 22.902 [s]
+[2026-02-18 00:42:07] Reading "C:\Users\99556\Desktop\Python Files\FM_DESKTOP-LAE97O5_7540/out1771375304.2475777540.tgf"...
+[2026-02-18 00:42:07] Reading "C:\Users\99556\Desktop\Python Files\FM_DESKTOP-LAE97O5_7540/out1771375304.2475777540.tgf"...
+[2026-02-18 00:42:07] nodes: 138493
+[2026-02-18 00:42:07] edges: 2315
+[2026-02-18 00:42:07] faces: 272364
+[2026-02-18 00:42:07] cells: 0
+[2026-02-18 00:42:07] appending mesh...
+[2026-02-18 00:42:07] done.
+[2026-02-18 00:42:08] generating pointers...done.
+[2026-02-18 00:42:08] extracting boundary entities...
+[2026-02-18 00:42:08]  139053 boundary nodes.
+[2026-02-18 00:42:08]  272924 boundary faces.
+[2026-02-18 00:42:08]  10 boundary face zones.
+[2026-02-18 00:42:08] done.
+[2026-02-18 00:42:20] Reading "C:\Users\99556\Desktop\Python Files\FM_DESKTOP-LAE97O5_7540\\NACA_0012_.sf"...
+[2026-02-18 00:42:20] Reading "C:\Users\99556\Desktop\Python Files\FM_DESKTOP-LAE97O5_7540\\NACA_0012_.sf"...
+[2026-02-18 00:42:25]  Read 15677349 vertices
+[2026-02-18 00:42:35] 0 faces marked.
+[2026-02-18 00:42:36]     computing regions...done
+[2026-02-18 00:42:37] Deleting import_curvature_0
+[2026-02-18 00:42:38]     processing size functions/scoped sizing to create Size Field...
+[2026-02-18 00:42:39] Writing "C:\Users\99556\Desktop\Python Files\FM_DESKTOP-LAE97O5_7540\NACA_0012_.sf"...
+[2026-02-18 00:42:39] Writing "C:\Users\99556\Desktop\Python Files\FM_DESKTOP-LAE97O5_7540\NACA_0012_.sf"...
+[2026-02-18 00:42:39] Done.
+[2026-02-18 00:42:40] remeshing...
+[2026-02-18 00:42:45] ------------------------- --------------------- -------------------- ---------------- ----------
+[2026-02-18 00:42:45]                      name skewed-cells (> 0.80)    averaged-skewness maximum-skewness face count
+[2026-02-18 00:42:45] ------------------------- --------------------- -------------------- ---------------- ----------
+[2026-02-18 00:42:45]                     solid                     0          0.034441434       0.64017118      63968
+[2026-02-18 00:42:45] ------------------------- --------------------- -------------------- ---------------- ----------
+[2026-02-18 00:42:45]                      name skewed-cells (> 0.80)    averaged-skewness maximum-skewness face count
+[2026-02-18 00:42:45] ------------------------- --------------------- -------------------- ---------------- ----------
+[2026-02-18 00:42:45]          naca_0012_-solid                     0          0.034441434       0.64017118      63968
+[2026-02-18 00:42:45] ---------------- After Surface mesh, the model consists of 1 fluid/solid regions and 0 voids.
+[2026-02-18 00:42:45] ---------------- Surface Meshing of NACA_0012_ complete in  2.05 minutes, with a maximum skewness of  0.64. 
+[2026-02-18 00:42:45] PASS: Surface mesh generated
+[2026-02-18 00:42:45] Improving surface mesh...
+[2026-02-18 00:42:46] 0 boundary nodes removed.
+[2026-02-18 00:42:46] 0 boundary faces removed.
+[2026-02-18 00:42:46] 0 boundary nodes removed.
+[2026-02-18 00:42:46] 0 boundary faces removed.
+[2026-02-18 00:42:46] ... iteration 1
+[2026-02-18 00:42:46]     the previous max quality = 0.640171
+[2026-02-18 00:42:46]     0 faces out of 0 candidates were modified.
+[2026-02-18 00:42:46] ... iteration 1
+[2026-02-18 00:42:46]     the previous max quality = 0.640171
+[2026-02-18 00:42:46]     0 faces out of 0 candidates were modified.
+[2026-02-18 00:42:46] ... iteration 1
+[2026-02-18 00:42:46]     the previous max quality = 0.640171
+[2026-02-18 00:42:46]     0 faces out of 0 candidates were modified.
+[2026-02-18 00:42:46] ... iteration 1
+[2026-02-18 00:42:46]     the previous max quality = 0.640171
+[2026-02-18 00:42:46]     0 faces out of 0 candidates were modified.
+[2026-02-18 00:42:46] ------------------------- --------------------- -------------------- ---------------- ----------
+[2026-02-18 00:42:46]                      name skewed-cells (> 0.70)    averaged-skewness maximum-skewness face count
+[2026-02-18 00:42:46] ------------------------- --------------------- -------------------- ---------------- ----------
+[2026-02-18 00:42:46]                     solid                     0          0.034441434       0.64017118      63968
+[2026-02-18 00:42:46] ------------------------- --------------------- -------------------- ---------------- ----------
+[2026-02-18 00:42:46]                      name skewed-cells (> 0.70)    averaged-skewness maximum-skewness face count
+[2026-02-18 00:42:46] ------------------------- --------------------- -------------------- ---------------- ----------
+[2026-02-18 00:42:46]          naca_0012_-solid                     0          0.034441434       0.64017118      63968
+[2026-02-18 00:42:46] ---------------- Surface Quality improvement complete in :  0.01 minutes. The final maximum surface skewness is  0.64. 
+[2026-02-18 00:42:46] PASS: Surface mesh improved...
+[2026-02-18 00:42:46] Describing Geometry...
+[2026-02-18 00:42:48] ---------------- Pressure-far-field zone type was automatically assigned to zones containing the string '*far*field*'.
+[2026-02-18 00:42:48] ---------------- Describe Geometry task complete in  0.00 minutes.
+[2026-02-18 00:42:48] Geometry description complete
+[2026-02-18 00:42:48] Updating boundaries...
+[2026-02-18 00:42:50] ---------------- Boundary Conditions Updated
+[2026-02-18 00:42:50] PASS: Boundaries updated
+[2026-02-18 00:42:50] Updating regions...
+[2026-02-18 00:42:50] ---------------- Regions Updated
+[2026-02-18 00:42:50] PASS: Regions updated
+[2026-02-18 00:42:50] Adding boundary layers...
+[2026-02-18 00:43:01] Created Scoped Prism: uniform
+[2026-02-18 00:43:01] ---------------- Inflation control added to naca_0012_-solid
+[2026-02-18 00:43:02] PASS: Boundary layers added
+[2026-02-18 00:43:02] Generating the volume mesh...
+[2026-02-18 00:43:02] Writing "C:\Users\99556\Desktop\Python Files\FM_DESKTOP-LAE97O5_7540\TaskObject11.msh.h5" ...
+[2026-02-18 00:43:02] writing 3 node zones
+[2026-02-18 00:43:02] writing 16 edge zones 
+[2026-02-18 00:43:02] writing 10 face zones 
+[2026-02-18 00:43:02] writing node curvature data
+[2026-02-18 00:43:09] done.
+[2026-02-18 00:43:09]     updating regions...
+[2026-02-18 00:43:09]     done.
+[2026-02-18 00:43:10] checking object "naca_0012_-solid"...
+[2026-02-18 00:43:10]     skipping validating regions of mesh object "naca_0012_-solid"...done.
+[2026-02-18 00:43:10] auto meshing object naca_0012_-solid...
+[2026-02-18 00:43:10] processing scoped prisms...
+[2026-02-18 00:43:10]     starting orientation...
+[2026-02-18 00:43:10] done.
+[2026-02-18 00:43:10]     setting prism growth...done.
+[2026-02-18 00:43:10] done.
+[2026-02-18 00:43:10] Identifying Topology...
+[2026-02-18 00:43:10] Generating Prisms...
+[2026-02-18 00:43:29] Generating initial mesh...
+[2026-02-18 00:43:30] Refining mesh...
+[2026-02-18 00:43:35] Create polyhedra ...
+[2026-02-18 00:44:08] Merging Domains...
+[2026-02-18 00:44:09] done.
+[2026-02-18 00:44:11]                      name       id cells (quality < 0.05)  minimum quality cell count
+[2026-02-18 00:44:11] ------------------------- -------- ---------------------- ---------------- ----------
+[2026-02-18 00:44:13]                     solid      715                      0       0.10584616     678703
+[2026-02-18 00:44:13]                      name       id cells (quality < 0.05)  minimum quality cell count
+[2026-02-18 00:44:13] ------------------------- -------- ---------------------- ---------------- ----------
+[2026-02-18 00:44:13]           Overall Summary     none                      0       0.10584616     678703
+[2026-02-18 00:44:13] Total Number of Cell Zones : 1
+[2026-02-18 00:44:13] [Quality Measure : Orthogonal Quality]
+[2026-02-18 00:44:13] ---------------- Volume mesh creation completed in :  1.07 minutes
+[2026-02-18 00:44:13] ---------------- 678703 cells were created in :  1.11 minutes
+[2026-02-18 00:44:15] ---------------- The mesh has a minimum Orthogonal Quality of:  0.11 
+[2026-02-18 00:44:15] ---------------- The volume meshing of naca_0012_-solid is complete.
+[2026-02-18 00:44:18] PASS: Volume mesh generated
+[2026-02-18 00:44:18] Improving volume mesh...
+[2026-02-18 00:44:35]                      name       id cells (quality < 0.15)  minimum quality cell count
+[2026-02-18 00:44:35] ------------------------- -------- ---------------------- ---------------- ----------
+[2026-02-18 00:44:37]                     solid      715                      0       0.15000767     678703
+[2026-02-18 00:44:37]                      name       id cells (quality < 0.15)  minimum quality cell count
+[2026-02-18 00:44:37] ------------------------- -------- ---------------------- ---------------- ----------
+[2026-02-18 00:44:37]           Overall Summary     none                      0       0.15000767     678703
+[2026-02-18 00:44:37] Total Number of Cell Zones : 1
+[2026-02-18 00:44:37] [Quality Measure : Orthogonal Quality]
+[2026-02-18 00:44:37] ---------------- Volume Quality improvement of naca_0012_-solid complete in :  0.32 minutes. The final minimum Orthogonal Quality is 0.150 
+[2026-02-18 00:44:37] PASS: Volume mesh improved...
+[2026-02-18 00:44:39] Writing "C:/Users/99556/Desktop/Meshing/NACA_0012\final_3906\NACA_0012_final.msh.h5" ...
+[2026-02-18 00:44:40] writing 6 node zones
+[2026-02-18 00:44:41] writing 8 edge zones 
+[2026-02-18 00:44:41] writing 6 face zones 
+[2026-02-18 00:44:42] writing 1 cell zones 
+[2026-02-18 00:44:42] writing boundary layer flags
+[2026-02-18 00:44:42] writing node curvature data
+[2026-02-18 00:44:42] done.Copying the required intermediate mesh files into C:\\Users\\99556\\Desktop\\Meshing\\NACA_0012\\final_3906\\NACA_0012_final_workflow_files
+[2026-02-18 00:44:42] Done.
+[2026-02-18 00:44:42] PASS: Mesh Saved
+[2026-02-18 00:44:42] Reading results...
+[2026-02-18 00:44:42] PASS: Timer Stopped.
+[2026-02-18 00:44:42] Total time taken: 5 minutes and 36.276 seconds
+[2026-02-18 00:44:42] Total time taken in seconds: 336.27596783638
+[2026-02-18 00:44:42] Maximum skweness value: 0.64
+[2026-02-18 00:44:42] Mininum orhtagonal quality: 0.15
+[2026-02-18 00:44:42] Cell count: 678703
+[2026-02-18 00:44:42] PASS: Complete
+[2026-02-18 00:44:42] PASS: Session closed

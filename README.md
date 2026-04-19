@@ -79,7 +79,7 @@ Pillow
 
 ### Ansys licence
 
-Aero-Opt requires an active Ansys Fluent licence with access to the **Adjoint Solver** module. Not all academic licences include Adjoint — check with your Ansys administrator before running optimisation jobs.
+Aero-Opt requires an active Ansys Fluent licence with access to the **Adjoint Solver** module. Not all academic licences include the Adjoint Solver — check with your Ansys administrator before running optimisation jobs.
 
 ---
 

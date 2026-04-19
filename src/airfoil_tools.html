@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Airfoil Tools</title>
+<script src="https://cdn.plot.ly/plotly-2.35.0.min.js"></script>
+<style>
+:root {
+  --bg: #0f172a; --surface: #1e293b; --surface2: #334155;
+  --border: #475569; --text: #e2e8f0; --text2: #94a3b8;
+  --accent: #3b82f6; --accent-hover: #2563eb; --green: #22c55e;
+  --red: #ef4444; --orange: #f59e0b; --radius: 10px;
+  --plot-bg: #0f172a; --plot-grid: #1e293b; --plot-zero: #334155;
+  --plot-font: #e2e8f0;
+}
+:root.light {
+  --bg: #f1f5f9; --surface: #ffffff; --surface2: #e2e8f0;
+  --border: #cbd5e1; --text: #1e293b; --text2: #64748b;
+  --accent: #2563eb; --accent-hover: #1d4ed8; --green: #16a34a;
+  --red: #dc2626; --orange: #d97706;
+  --plot-bg: #ffffff; --plot-grid: #e2e8f0; --plot-zero: #cbd5e1;
+  --plot-font: #1e293b;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg); color: var(--text);
+  display: flex; height: 100vh; overflow: hidden;
+}
+#sidebar {
+  width: 320px; min-width: 320px; background: var(--surface);
+  border-right: 1px solid var(--border); display: flex; flex-direction: column;
+  overflow: hidden;
+}
+#main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.tab-bar {
+  display: flex; border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.tab-btn {
+  flex: 1; padding: 12px; background: transparent; border: none;
+  color: var(--text2); font-size: 14px; font-weight: 600; cursor: pointer;
+  border-bottom: 2px solid transparent; transition: all 0.2s;
+}
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+.tab-btn:hover { color: var(--text); background: var(--surface2); }
+.tab-content { flex: 1; overflow-y: auto; padding: 16px; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+.drop-zone {
+  border: 2px dashed var(--border); border-radius: var(--radius);
+  padding: 24px 16px; text-align: center; cursor: pointer;
+  transition: all 0.2s; margin-bottom: 12px; position: relative;
+}
+.drop-zone:hover, .drop-zone.dragover {
+  border-color: var(--accent); background: rgba(59,130,246,0.1);
+}
+.drop-zone input[type="file"] {
+  position: absolute; inset: 0; opacity: 0; cursor: pointer;
+}
+.drop-zone p { color: var(--text2); font-size: 13px; }
+.drop-zone p strong { color: var(--text); }
+label { display: block; font-size: 12px; color: var(--text2); margin-bottom: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+select, input[type="number"] {
+  width: 100%; padding: 8px 10px; background: var(--surface2);
+  border: 1px solid var(--border); border-radius: 6px;
+  color: var(--text); font-size: 13px; outline: none;
+}
+select:focus, input[type="number"]:focus { border-color: var(--accent); }
+.section { margin-bottom: 16px; }
+.section-title { font-size: 11px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+.checkbox-row {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 13px;
+}
+.checkbox-row input[type="checkbox"] { accent-color: var(--accent); }
+.btn {
+  padding: 8px 14px; border: none; border-radius: 6px; font-size: 13px;
+  font-weight: 600; cursor: pointer; transition: all 0.2s;
+}
+.btn-primary { background: var(--accent); color: white; }
+.btn-primary:hover { background: var(--accent-hover); }
+.btn-danger { background: var(--red); color: white; }
+.btn-danger:hover { background: #dc2626; }
+.btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+.btn-secondary:hover { background: var(--border); }
+.btn-sm { padding: 5px 10px; font-size: 12px; }
+#toolbar {
+  display: none; flex-shrink: 0; padding: 8px 16px;
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  gap: 6px; flex-wrap: wrap; align-items: center;
+}
+#toolbar.visible { display: flex; }
+.tool-btn {
+  padding: 6px 12px; border: 1px solid var(--border); border-radius: 6px;
+  background: var(--surface2); color: var(--text); font-size: 12px;
+  cursor: pointer; transition: all 0.15s; font-weight: 500;
+}
+.tool-btn:hover { border-color: var(--accent); color: var(--accent); }
+.tool-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+.tool-sep { width: 1px; height: 24px; background: var(--border); margin: 0 4px; }
+#plotArea { flex: 1; position: relative; }
+#sorterPlot, #comparerPlot { width: 100%; height: 100%; }
+.card-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.card {
+  flex: 1; min-width: 120px; padding: 10px; background: var(--surface2);
+  border: 1px solid var(--border); border-radius: 8px; cursor: pointer;
+  text-align: center; font-size: 12px; font-weight: 600; transition: all 0.15s;
+}
+.card:hover { border-color: var(--accent); }
+.card.active { border-color: var(--accent); background: rgba(59,130,246,0.15); color: var(--accent); }
+.info-text { font-size: 12px; color: var(--text2); margin-bottom: 8px; }
+.scale-row { display: flex; gap: 8px; margin-bottom: 8px; }
+.scale-row > div { flex: 1; }
+#chordInfo {
+  flex-shrink: 0; padding: 12px 16px; border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+#chordInfo .section-title { margin-bottom: 6px; }
+#chordDefault, #chordOverlay {
+  font-size: 13px; color: var(--text); padding: 6px 8px;
+  background: var(--surface2); border-radius: 6px; margin-bottom: 4px;
+}
+#statusBar {
+  padding: 4px 16px; background: var(--surface); border-top: 1px solid var(--border);
+  font-size: 11px; color: var(--text2); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: space-between;
+}
+#themeToggle, #btnCopySvg {
+  padding: 3px 10px; border: 1px solid var(--border); border-radius: 4px;
+  background: var(--surface2); color: var(--text2); font-size: 11px;
+  cursor: pointer; transition: all 0.15s;
+}
+#themeToggle:hover, #btnCopySvg:hover { border-color: var(--accent); color: var(--text); }
+.status-actions { display: flex; gap: 6px; }
+</style>
+</head>
+<body>
+
+<div id="sidebar">
+  <div class="tab-bar">
+    <button class="tab-btn active" data-tab="sorter">Sorter</button>
+    <button class="tab-btn" data-tab="compare">Compare</button>
+  </div>
+  <div class="tab-content">
+    <div id="sorterPanel" class="tab-panel active">
+      <div class="drop-zone" id="sorterDrop">
+        <input type="file" id="sorterFile">
+        <p><strong>Click or drop file</strong><br>Load airfoil coordinates</p>
+      </div>
+      <div id="sorterFileName" class="info-text"></div>
+
+      <div class="section">
+        <label>Sorting Algorithm</label>
+        <select id="sortAlgo">
+          <option value="angular">Angular (centroid)</option>
+          <option value="chordline">Chord-line split</option>
+          <option value="nn_le">Nearest neighbour (LE)</option>
+          <option value="nn_te">Nearest neighbour (TE)</option>
+          <option value="convex_hull">Convex hull</option>
+          <option value="original">Original order</option>
+        </select>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Display</div>
+        <div class="checkbox-row"><input type="checkbox" id="chkShowSorterPts" checked><span>Show points</span></div>
+        <div class="checkbox-row"><input type="checkbox" id="chkClose"><span>Close curve</span></div>
+        <div class="checkbox-row"><input type="checkbox" id="chkIndices"><span>Show point indices</span></div>
+        <div class="checkbox-row"><input type="checkbox" id="chkArrows"><span>Show direction arrows</span></div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Export</div>
+        <div class="checkbox-row"><input type="checkbox" id="chkNormalize" checked><span>Normalize (LE to origin, chord=1)</span></div>
+        <div style="margin-bottom:8px">
+          <label>Extra scale</label>
+          <input type="number" id="extraScale" value="1.0" step="0.1" min="0.001">
+        </div>
+        <button class="btn btn-primary" id="btnExport" style="width:100%" disabled>Export sorted .txt</button>
+      </div>
+    </div>
+
+    <div id="comparePanel" class="tab-panel">
+      <div class="section">
+        <div class="section-title">Default Airfoils</div>
+        <div class="card-grid" id="airfoilCards"></div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Overlay</div>
+        <div class="drop-zone" id="compareDrop">
+          <input type="file" id="compareFile">
+          <p><strong>Click or drop file</strong><br>Load displaced shape</p>
+        </div>
+        <div id="compareFileName" class="info-text"></div>
+        <button class="btn btn-danger btn-sm" id="btnClearOverlay" style="width:100%;margin-bottom:8px" disabled>Clear overlay</button>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Legend Names</div>
+        <div style="margin-bottom:6px"><label>Default airfoil</label><input type="text" id="legendDefault" value="" placeholder="(uses airfoil name)" style="width:100%;padding:6px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;outline:none;"></div>
+        <div><label>Overlay</label><input type="text" id="legendOverlay" value="" placeholder="(uses file name)" style="width:100%;padding:6px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;outline:none;"></div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Scale</div>
+        <div style="margin-bottom:6px"><label>Default scale</label><input type="number" id="defaultScale" value="1.0" step="0.1" min="0.001"></div>
+        <div><label>Overlay scale</label><input type="number" id="overlayScale" value="1.0" step="0.1" min="0.001"></div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Display</div>
+        <div class="checkbox-row"><input type="checkbox" id="chkShowPts" checked><span>Show points</span></div>
+        <div class="checkbox-row"><input type="checkbox" id="chkFill"><span>Fill shapes</span></div>
+      </div>
+    </div>
+  </div>
+  <div id="chordInfo">
+    <div class="section-title">Chord Lengths</div>
+    <div id="chordDefault">Default: --</div>
+    <div id="chordOverlay">Overlay: --</div>
+  </div>
+</div>
+
+<div id="main">
+  <div id="toolbar">
+    <button class="tool-btn" data-tool="move">Move point</button>
+    <button class="tool-btn" data-tool="reverse">Reverse segment</button>
+    <button class="tool-btn" data-tool="delete">Delete point</button>
+    <div class="tool-sep"></div>
+    <button class="tool-btn" id="btnUndo">Undo (Ctrl+Z)</button>
+    <button class="tool-btn" id="btnReset">Reset</button>
+  </div>
+  <div id="plotArea">
+    <div id="sorterPlot"></div>
+    <div id="comparerPlot" style="display:none"></div>
+  </div>
+  <div id="statusBar">
+    <span id="statusText">Ready</span>
+    <div class="status-actions">
+      <button id="btnCopySvg">Copy SVG</button>
+      <button id="themeToggle">Dark mode</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== EMBEDDED AIRFOIL DATA =====
+const DEFAULT_AIRFOILS = {"BACXXX":{"xs":[1.0,0.95,0.9,0.85,0.8,0.75,0.7,0.65,0.6,0.55,0.5,0.45,0.4,0.35,0.3,0.25,0.2,0.15,0.125,0.1,0.075,0.05,0.0375,0.025,0.02,0.015,0.005,0.0025,0.001,0.0005,0.0,0.0005,0.001,0.0025,0.005,0.015,0.02,0.025,0.0375,0.05,0.075,0.1,0.125,0.15,0.2,0.25,0.3,0.35,0.4,0.45,0.5,0.55,0.6,0.65,0.7,0.75,0.8,0.85,0.9,0.95,1.0],"ys":[0.0,0.0116,0.0218,0.0307,0.0384,0.045,0.0503,0.0548,0.0585,0.0613,0.0636,0.0654,0.0667,0.0673,0.0674,0.0665,0.0643,0.0599,0.0566,0.0521,0.0465,0.0384,0.0334,0.0271,0.0242,0.0207,0.0112,0.0078,0.005,0.0037,0.0,-0.0018,-0.0027,-0.0043,-0.0058,-0.0098,-0.0112,-0.0125,-0.0152,-0.0175,-0.0216,-0.0254,-0.0288,-0.032,-0.0375,-0.0417,-0.0445,-0.0458,-0.0457,-0.0443,-0.0417,-0.0383,-0.0344,-0.0303,-0.026,-0.0218,-0.0174,-0.0132,-0.009,-0.0047,0.0]},"NACA 0012":{"xs":[1.0,0.998459,0.993844,0.986185,0.975528,0.96194,0.945503,0.92632,0.904508,0.880203,0.853553,0.824724,0.793893,0.761249,0.726995,0.691342,0.654508,0.616723,0.578217,0.53923,0.5,0.46077,0.421783,0.383277,0.345492,0.308658,0.273005,0.238751,0.206107,0.175276,0.146447,0.119797,0.095492,0.07368,0.054497,0.03806,0.024472,0.013815,0.006156,0.001541,0.0,0.001541,0.006156,0.013815,0.024472,0.03806,0.054497,0.07368,0.095492,0.119797,0.146447,0.175276,0.206107,0.238751,0.273005,0.308658,0.345492,0.383277,0.421783,0.46077,0.5,0.53923,0.578217,0.616723,0.654508,0.691342,0.726995,0.761249,0.793893,0.824724,0.853553,0.880203,0.904508,0.92632,0.945503,0.96194,0.975528,0.986185,0.993844,0.998459,1.0],"ys":[0.0,0.000224,0.000891,0.00199,0.003501,0.005399,0.007651,0.010221,0.013071,0.016158,0.019438,0.022869,0.026405,0.03,0.03361,0.037188,0.040686,0.044055,0.047242,0.050196,0.052862,0.055184,0.057108,0.058582,0.059557,0.059988,0.059841,0.059088,0.057712,0.055708,0.053083,0.049854,0.046049,0.041705,0.036867,0.03158,0.025893,0.019854,0.013503,0.006877,0.0,-0.006877,-0.013503,-0.019854,-0.025893,-0.03158,-0.036867,-0.041705,-0.046049,-0.049854,-0.053083,-0.055708,-0.057712,-0.059088,-0.059841,-0.059988,-0.059557,-0.058582,-0.057108,-0.055184,-0.052862,-0.050196,-0.047242,-0.044055,-0.040686,-0.037188,-0.03361,-0.03,-0.026405,-0.022869,-0.019438,-0.016158,-0.013071,-0.010221,-0.007651,-0.005399,-0.003501,-0.00199,-0.000891,-0.000224,0.0]},"NACA 2412":{"xs":[1.0,0.998474,0.993903,0.986314,0.975752,0.962276,0.945966,0.926917,0.90524,0.881064,0.854532,0.825802,0.795047,0.762452,0.728216,0.692545,0.655659,0.617783,0.579153,0.540006,0.500587,0.461143,0.421921,0.383032,0.34468,0.307289,0.271106,0.236371,0.203313,0.172151,0.143089,0.116313,0.091996,0.070289,0.051324,0.035214,0.022051,0.011907,0.004833,0.00086,0.0,0.002223,0.007479,0.015723,0.026892,0.040906,0.057669,0.077071,0.098987,0.123281,0.149805,0.178401,0.208902,0.241131,0.274904,0.310028,0.346303,0.383522,0.421645,0.460398,0.499413,0.538453,0.577282,0.615662,0.653358,0.690139,0.725775,0.760046,0.792738,0.823646,0.852575,0.879342,0.903777,0.925723,0.94504,0.961603,0.975305,0.986056,0.993785,0.998444,1.0],"ys":[0.0,0.000326,0.001298,0.002896,0.005092,0.007845,0.011105,0.014814,0.01891,0.023324,0.027985,0.032822,0.03776,0.042726,0.047648,0.052453,0.057071,0.061432,0.065468,0.069113,0.072303,0.074977,0.077082,0.078547,0.07918,0.07893,0.077795,0.07579,0.072945,0.069308,0.06494,0.059917,0.054325,0.048257,0.041808,0.035076,0.028152,0.02112,0.014049,0.006997,0.0,-0.006689,-0.012828,-0.018404,-0.023408,-0.027826,-0.031651,-0.034878,-0.037507,-0.039546,-0.041012,-0.041933,-0.042343,-0.04229,-0.041827,-0.041016,-0.039923,-0.038617,-0.037134,-0.035388,-0.033414,-0.031267,-0.028997,-0.026651,-0.024269,-0.021884,-0.019529,-0.017226,-0.014999,-0.012865,-0.010842,-0.008946,-0.007191,-0.005594,-0.004169,-0.002931,-0.001896,-0.001076,-0.000481,-0.000121,0.0]},"NASA SC(2) 0714":{"xs":[1.0,0.99,0.98,0.97,0.96,0.95,0.94,0.93,0.92,0.91,0.9,0.89,0.88,0.87,0.86,0.85,0.84,0.83,0.82,0.81,0.8,0.79,0.78,0.77,0.76,0.75,0.74,0.73,0.72,0.71,0.7,0.69,0.68,0.67,0.66,0.65,0.64,0.63,0.62,0.61,0.6,0.59,0.58,0.57,0.56,0.55,0.54,0.53,0.52,0.51,0.5,0.49,0.48,0.47,0.46,0.45,0.44,0.43,0.42,0.41,0.4,0.39,0.38,0.37,0.36,0.35,0.34,0.33,0.32,0.31,0.3,0.29,0.28,0.27,0.26,0.25,0.24,0.23,0.22,0.21,0.2,0.19,0.18,0.17,0.16,0.15,0.14,0.13,0.12,0.11,0.1,0.09,0.08,0.07,0.06,0.05,0.04,0.03,0.02,0.01,0.005,0.002,0.0,0.002,0.005,0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15,0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62,0.63,0.64,0.65,0.66,0.67,0.68,0.69,0.7,0.71,0.72,0.73,0.74,0.75,0.76,0.77,0.78,0.79,0.8,0.81,0.82,0.83,0.84,0.85,0.86,0.87,0.88,0.89,0.9,0.91,0.92,0.93,0.94,0.95,0.96,0.97,0.98,0.99,1.0],"ys":[-0.013,-0.0063,-0.0032,-0.0002,0.0027,0.0056,0.0084,0.0111,0.0137,0.0162,0.0187,0.0211,0.0234,0.0256,0.0278,0.0299,0.0319,0.0339,0.0358,0.0376,0.0394,0.0411,0.0427,0.0443,0.0458,0.0473,0.0487,0.05,0.0513,0.0525,0.0537,0.0548,0.0559,0.0569,0.0579,0.0588,0.0597,0.0605,0.0613,0.0621,0.0628,0.0635,0.0641,0.0647,0.0653,0.0658,0.0663,0.0668,0.0672,0.0676,0.068,0.0683,0.0686,0.0689,0.0691,0.0693,0.0695,0.0696,0.0697,0.0698,0.0699,0.0699,0.0699,0.0699,0.0698,0.0697,0.0696,0.0694,0.0692,0.0689,0.0686,0.0683,0.0679,0.0675,0.067,0.0665,0.066,0.0654,0.0648,0.0641,0.0633,0.0625,0.0616,0.0607,0.0597,0.0586,0.0574,0.0562,0.0549,0.0535,0.0519,0.0502,0.0484,0.0463,0.044,0.0414,0.0383,0.0346,0.0296,0.0224,0.01658,0.01077,0.0,-0.01077,-0.01658,-0.0224,-0.0296,-0.0345,-0.0382,-0.0413,-0.0439,-0.0462,-0.0483,-0.0501,-0.0518,-0.0534,-0.0549,-0.0562,-0.0574,-0.0586,-0.0597,-0.0607,-0.0616,-0.0625,-0.0633,-0.0641,-0.0648,-0.0655,-0.0661,-0.0667,-0.0672,-0.0677,-0.0681,-0.0685,-0.0688,-0.0691,-0.0693,-0.0695,-0.0696,-0.0697,-0.0697,-0.0697,-0.0696,-0.0695,-0.0693,-0.0691,-0.0688,-0.0685,-0.0681,-0.0677,-0.0672,-0.0667,-0.0661,-0.0654,-0.0646,-0.0637,-0.0627,-0.0616,-0.0604,-0.0591,-0.0577,-0.0562,-0.0546,-0.0529,-0.0511,-0.0492,-0.0473,-0.0453,-0.0433,-0.0412,-0.0391,-0.037,-0.0348,-0.0326,-0.0304,-0.0282,-0.026,-0.0238,-0.0216,-0.0194,-0.0173,-0.0152,-0.0132,-0.0113,-0.0095,-0.0079,-0.0064,-0.005,-0.0038,-0.0028,-0.002,-0.0014,-0.001,-0.0008,-0.0009,-0.0012,-0.0017,-0.0025,-0.0036,-0.005,-0.0067,-0.0087,-0.011,-0.0136,-0.013]}};
+
+// ===== STATE =====
+let sorterState = {
+  rawPts: null,        // [{x,y}, ...] original parsed
+  sortedPts: null,     // [{x,y}, ...] after sorting
+  editedPts: null,     // [{x,y}, ...] current working copy
+  undoStack: [],
+  fileName: '',
+  activeTool: null,
+  selectedIdx: null,
+  savedRanges: null
+};
+
+let compareState = {
+  activeAirfoil: 'BACXXX',
+  overlayPts: null,
+  overlayName: '',
+  savedRanges: null
+};
+
+let currentTab = 'sorter';
+
+// ===== FILE PARSING =====
+function parseAirfoilFile(text) {
+  const lines = text.trim().split(/\r?\n/);
+  let startIdx = 0;
+  if (lines.length > 0) {
+    const first = lines[0].trim();
+    if (/^\d+$/.test(first)) startIdx = 1;
+  }
+  const pts = [];
+  for (let i = startIdx; i < lines.length; i++) {
+    const parts = lines[i].trim().split(/\s+/);
+    if (parts.length < 2) continue;
+    const x = parseFloat(parts[0]);
+    const y = parseFloat(parts[1]);
+    if (isNaN(x) || isNaN(y)) continue;
+    pts.push({x, y});
+  }
+  return pts;
+}
+
+// ===== SORTING ALGORITHMS =====
+function dist(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
+
+function rotateToStart(pts) {
+  if (pts.length === 0) return pts;
+  // Find point nearest (0,0)
+  let bestIdx = 0;
+  let bestDist = Math.hypot(pts[0].x, pts[0].y);
+  for (let i = 1; i < pts.length; i++) {
+    const d = Math.hypot(pts[i].x, pts[i].y);
+    if (d < bestDist) { bestDist = d; bestIdx = i; }
+  }
+  // If distance > 1e-4, use min-x point instead
+  if (bestDist > 1e-4) {
+    bestIdx = 0;
+    let minX = pts[0].x;
+    for (let i = 1; i < pts.length; i++) {
+      if (pts[i].x < minX) { minX = pts[i].x; bestIdx = i; }
+    }
+  }
+  return [...pts.slice(bestIdx), ...pts.slice(0, bestIdx)];
+}
+
+function sortAngularCentroid(pts) {
+  if (pts.length === 0) return [];
+  const cx = pts.reduce((s, p) => s + p.x, 0) / pts.length;
+  const cy = pts.reduce((s, p) => s + p.y, 0) / pts.length;
+  const sorted = pts.slice().sort((a, b) => {
+    const aa = Math.atan2(a.y - cy, a.x - cx);
+    const ab = Math.atan2(b.y - cy, b.x - cx);
+    return aa - ab;
+  });
+  return rotateToStart(sorted);
+}
+
+function sortChordLineSplit(pts) {
+  if (pts.length < 2) return pts.slice();
+  // Find LE (min x) and TE (max x)
+  let leIdx = 0, teIdx = 0;
+  for (let i = 1; i < pts.length; i++) {
+    if (pts[i].x < pts[leIdx].x) leIdx = i;
+    if (pts[i].x > pts[teIdx].x) teIdx = i;
+  }
+  const le = pts[leIdx], te = pts[teIdx];
+  const dx = te.x - le.x, dy = te.y - le.y;
+  // Split into upper (above chord line) and lower (below)
+  const upper = [], lower = [], onLine = [];
+  for (let i = 0; i < pts.length; i++) {
+    const p = pts[i];
+    // Cross product to determine side
+    const cross = dx * (p.y - le.y) - dy * (p.x - le.x);
+    if (Math.abs(cross) < 1e-12) {
+      onLine.push(p);
+    } else if (cross > 0) {
+      upper.push(p);
+    } else {
+      lower.push(p);
+    }
+  }
+  // Sort upper by x ascending, lower by x descending
+  upper.sort((a, b) => a.x - b.x);
+  lower.sort((a, b) => b.x - a.x);
+  // On-line points go to upper surface sorted by x ascending
+  onLine.sort((a, b) => a.x - b.x);
+  const result = [...upper, ...onLine.filter(p => p !== le && p !== te), ...lower];
+  // Make sure LE and TE are included
+  if (!result.some(p => p.x === le.x && p.y === le.y)) result.unshift(le);
+  return rotateToStart(result);
+}
+
+function sortNearestNeighbour(pts, startIdx) {
+  if (pts.length === 0) return [];
+  const visited = new Array(pts.length).fill(false);
+  const result = [];
+  let cur = startIdx;
+  for (let step = 0; step < pts.length; step++) {
+    visited[cur] = true;
+    result.push(pts[cur]);
+    let bestDist = Infinity, bestIdx = -1;
+    for (let j = 0; j < pts.length; j++) {
+      if (!visited[j]) {
+        const d = dist(pts[cur], pts[j]);
+        if (d < bestDist) { bestDist = d; bestIdx = j; }
+      }
+    }
+    cur = bestIdx;
+  }
+  return result;
+}
+
+function sortNNLE(pts) {
+  if (pts.length === 0) return [];
+  let leIdx = 0;
+  for (let i = 1; i < pts.length; i++) {
+    if (pts[i].x < pts[leIdx].x) leIdx = i;
+  }
+  return sortNearestNeighbour(pts, leIdx);
+}
+
+function sortNNTE(pts) {
+  if (pts.length === 0) return [];
+  let teIdx = 0;
+  for (let i = 1; i < pts.length; i++) {
+    if (pts[i].x > pts[teIdx].x) teIdx = i;
+  }
+  const result = sortNearestNeighbour(pts, teIdx);
+  return rotateToStart(result);
+}
+
+function cross2d(O, A, B) {
+  return (A.x - O.x) * (B.y - O.y) - (A.y - O.y) * (B.x - O.x);
+}
+
+function convexHull(pts) {
+  const sorted = pts.slice().sort((a, b) => a.x - b.x || a.y - b.y);
+  if (sorted.length <= 1) return sorted;
+  const lower = [];
+  for (const p of sorted) {
+    while (lower.length >= 2 && cross2d(lower[lower.length-2], lower[lower.length-1], p) <= 0)
+      lower.pop();
+    lower.push(p);
+  }
+  const upper = [];
+  for (let i = sorted.length - 1; i >= 0; i--) {
+    const p = sorted[i];
+    while (upper.length >= 2 && cross2d(upper[upper.length-2], upper[upper.length-1], p) <= 0)
+      upper.pop();
+    upper.push(p);
+  }
+  lower.pop();
+  upper.pop();
+  return lower.concat(upper);
+}
+
+function sortConvexHull(pts) {
+  if (pts.length <= 3) return rotateToStart(pts.slice());
+  const hull = convexHull(pts);
+  const hullSet = new Set();
+  for (const p of hull) hullSet.add(p);
+  const interior = pts.filter(p => !hullSet.has(p));
+  // Insert interior points at nearest edge
+  const result = hull.slice();
+  for (const p of interior) {
+    let bestCost = Infinity, bestPos = 0;
+    for (let i = 0; i < result.length; i++) {
+      const j = (i + 1) % result.length;
+      const cost = dist(result[i], p) + dist(p, result[j]) - dist(result[i], result[j]);
+      if (cost < bestCost) { bestCost = cost; bestPos = j; }
+    }
+    result.splice(bestPos, 0, p);
+  }
+  return rotateToStart(result);
+}
+
+function applySort(pts, algo) {
+  switch (algo) {
+    case 'angular': return sortAngularCentroid(pts);
+    case 'chordline': return sortChordLineSplit(pts);
+    case 'nn_le': return sortNNLE(pts);
+    case 'nn_te': return sortNNTE(pts);
+    case 'convex_hull': return sortConvexHull(pts);
+    case 'original': return pts.slice();
+    default: return pts.slice();
+  }
+}
+
+// ===== THEME =====
+function getThemeColors() {
+  const s = getComputedStyle(document.documentElement);
+  return {
+    bg: s.getPropertyValue('--plot-bg').trim(),
+    grid: s.getPropertyValue('--plot-grid').trim(),
+    zero: s.getPropertyValue('--plot-zero').trim(),
+    font: s.getPropertyValue('--plot-font').trim(),
+    border: s.getPropertyValue('--border').trim()
+  };
+}
+
+function makePlotLayout() {
+  const c = getThemeColors();
+  return {
+    paper_bgcolor: c.bg, plot_bgcolor: c.bg,
+    font: { color: c.font, family: 'Segoe UI, system-ui, sans-serif' },
+    margin: { l: 50, r: 20, t: 40, b: 40 },
+    xaxis: { gridcolor: c.grid, zerolinecolor: c.zero, scaleanchor: 'y', constrain: 'domain', title: { text: 'x', font: { size: 12 } } },
+    yaxis: { gridcolor: c.grid, zerolinecolor: c.zero, title: { text: 'y', font: { size: 12 } } },
+    showlegend: false,
+    dragmode: 'zoom',
+    title: { text: '', font: { size: 14 } }
+  };
+}
+
+// ===== SORTER PLOT =====
+
+function initSorterPlot() {
+  Plotly.newPlot('sorterPlot', [], makePlotLayout(), { responsive: true, scrollZoom: true });
+}
+
+function initComparerPlot() {
+  Plotly.newPlot('comparerPlot', [], makePlotLayout(), { responsive: true, scrollZoom: true });
+}
+
+function getSorterRanges() {
+  const el = document.getElementById('sorterPlot');
+  try {
+    const layout = el._fullLayout;
+    if (layout && layout.xaxis && layout.xaxis.range && layout.yaxis && layout.yaxis.range) {
+      return {
+        xrange: [...layout.xaxis.range],
+        yrange: [...layout.yaxis.range]
+      };
+    }
+  } catch(e) {}
+  return null;
+}
+
+function getComparerRanges() {
+  const el = document.getElementById('comparerPlot');
+  try {
+    const layout = el._fullLayout;
+    if (layout && layout.xaxis && layout.xaxis.range && layout.yaxis && layout.yaxis.range) {
+      return {
+        xrange: [...layout.xaxis.range],
+        yrange: [...layout.yaxis.range]
+      };
+    }
+  } catch(e) {}
+  return null;
+}
+
+function drawSorter(preserveZoom) {
+  const pts = sorterState.editedPts;
+  if (!pts || pts.length === 0) {
+    Plotly.react('sorterPlot', [], makePlotLayout(), { responsive: true, scrollZoom: true });
+    return;
+  }
+  const xs = pts.map(p => p.x);
+  const ys = pts.map(p => p.y);
+  const showSorterPts = document.getElementById('chkShowSorterPts').checked;
+  const closeCurve = document.getElementById('chkClose').checked;
+  const showIndices = document.getElementById('chkIndices').checked;
+  const showArrows = document.getElementById('chkArrows').checked;
+  const edited = sorterState.undoStack.length > 0;
+
+  let plotXs = xs.slice(), plotYs = ys.slice();
+  if (closeCurve && pts.length > 1) {
+    plotXs.push(pts[0].x);
+    plotYs.push(pts[0].y);
+  }
+
+  const traces = [];
+  // Main line
+  traces.push({
+    x: plotXs, y: plotYs,
+    mode: showSorterPts ? 'lines+markers' : 'lines',
+    line: { color: '#3b82f6', width: 2 },
+    marker: { color: '#3b82f6', size: 7 },
+    hovertemplate: 'x: %{x}<br>y: %{y}<extra></extra>'
+  });
+
+  // Invisible hit targets for easier clicking when a tool is active
+  if (sorterState.activeTool) {
+    traces.push({
+      x: xs, y: ys,
+      mode: 'markers',
+      marker: { color: 'rgba(0,0,0,0)', size: 20 },
+      hovertemplate: 'x: %{x}<br>y: %{y}<extra></extra>',
+      showlegend: false
+    });
+  }
+
+  // Start point (green diamond)
+  traces.push({
+    x: [pts[0].x], y: [pts[0].y],
+    mode: 'markers',
+    marker: { color: '#22c55e', size: 12, symbol: 'diamond' },
+    hoverinfo: 'skip'
+  });
+
+  // Selected point
+  if (sorterState.selectedIdx !== null && sorterState.selectedIdx < pts.length) {
+    traces.push({
+      x: [pts[sorterState.selectedIdx].x], y: [pts[sorterState.selectedIdx].y],
+      mode: 'markers',
+      marker: { color: '#f59e0b', size: 10 },
+      hoverinfo: 'skip'
+    });
+  }
+
+  // Point indices
+  if (showIndices) {
+    traces.push({
+      x: xs, y: ys,
+      mode: 'text',
+      text: xs.map((_, i) => String(i)),
+      textposition: 'top center',
+      textfont: { size: 9, color: '#94a3b8' },
+      hoverinfo: 'skip'
+    });
+  }
+
+  const layout = makePlotLayout();
+  layout.title.text = sorterState.fileName + (edited ? ' (edited)' : '');
+
+  if (sorterState.activeTool) {
+    layout.dragmode = false;
+  } else {
+    layout.dragmode = 'zoom';
+  }
+
+  // Direction arrows as annotations
+  layout.annotations = [];
+  if (showArrows && pts.length > 2) {
+    const totalPts = closeCurve ? pts.length : pts.length - 1;
+    const arrowCount = Math.max(1, Math.round(totalPts / 20));
+    const step = Math.max(1, Math.floor(totalPts / arrowCount));
+    for (let i = 0; i < totalPts; i += step) {
+      const j = (i + 1) % pts.length;
+      const ax = pts[i].x, ay = pts[i].y;
+      const bx = pts[j].x, by = pts[j].y;
+      const mx = (ax + bx) / 2, my = (ay + by) / 2;
+      layout.annotations.push({
+        x: bx, y: by,
+        ax: ax, ay: ay,
+        xref: 'x', yref: 'y', axref: 'x', ayref: 'y',
+        showarrow: true,
+        arrowhead: 3, arrowsize: 1.5, arrowwidth: 1.5,
+        arrowcolor: '#f59e0b',
+        text: '', standoff: 4
+      });
+    }
+  }
+
+  if (preserveZoom && sorterState.savedRanges) {
+    layout.xaxis.range = sorterState.savedRanges.xrange;
+    layout.yaxis.range = sorterState.savedRanges.yrange;
+    layout.xaxis.autorange = false;
+    layout.yaxis.autorange = false;
+  }
+
+  Plotly.react('sorterPlot', traces, layout, { responsive: true, scrollZoom: true });
+  updateChordLengths();
+  setStatus(`${pts.length} points` + (edited ? ' (edited)' : ''));
+}
+
+// ===== EDIT TOOLS =====
+function pushUndo() {
+  sorterState.undoStack.push(sorterState.editedPts.map(p => ({x: p.x, y: p.y})));
+}
+
+function undo() {
+  if (sorterState.undoStack.length === 0) return;
+  sorterState.editedPts = sorterState.undoStack.pop();
+  sorterState.selectedIdx = null;
+  sorterState.savedRanges = getSorterRanges();
+  drawSorter(true);
+}
+
+function resetEdits() {
+  if (!sorterState.sortedPts) return;
+  sorterState.editedPts = sorterState.sortedPts.map(p => ({x: p.x, y: p.y}));
+  sorterState.undoStack = [];
+  sorterState.selectedIdx = null;
+  sorterState.savedRanges = null;
+  drawSorter(false);
+}
+
+function findNearestPoint(cx, cy) {
+  const pts = sorterState.editedPts;
+  if (!pts) return -1;
+  let bestIdx = 0, bestDist = Infinity;
+  for (let i = 0; i < pts.length; i++) {
+    const d = Math.hypot(pts[i].x - cx, pts[i].y - cy);
+    if (d < bestDist) { bestDist = d; bestIdx = i; }
+  }
+  return bestIdx;
+}
+
+// Convert pixel position on the plot element to data coordinates
+function pixelToData(plotEl, pixelX, pixelY) {
+  const fl = plotEl._fullLayout;
+  const xa = fl.xaxis, ya = fl.yaxis;
+  // Plot area bounds in pixels (relative to the plot element)
+  const plotLeft = xa._offset, plotTop = ya._offset;
+  const plotWidth = xa._length, plotHeight = ya._length;
+  const relX = pixelX - plotLeft, relY = pixelY - plotTop;
+  const xRange = xa.range, yRange = ya.range;
+  const dataX = xRange[0] + (relX / plotWidth) * (xRange[1] - xRange[0]);
+  const dataY = yRange[1] - (relY / plotHeight) * (yRange[1] - yRange[0]);
+  return { x: dataX, y: dataY };
+}
+
+function handlePlotClick(data) {
+  if (!sorterState.activeTool || !sorterState.editedPts) return;
+  const point = data.points[0];
+  if (!point) return;
+  const cx = point.x, cy = point.y;
+  const nearIdx = findNearestPoint(cx, cy);
+  const tool = sorterState.activeTool;
+
+  if (tool === 'move') {
+    // First click: select the point to move
+    if (sorterState.selectedIdx === null) {
+      sorterState.selectedIdx = nearIdx;
+      sorterState._moveJustSelected = true; // flag to prevent raw click from firing on same click
+      sorterState.savedRanges = getSorterRanges();
+      drawSorter(true);
+      setStatus('Click anywhere to place point ' + nearIdx);
+    }
+    // Second click handled by handlePlotRawClick below
+  } else if (tool === 'reverse') {
+    if (sorterState.selectedIdx === null) {
+      sorterState.selectedIdx = nearIdx;
+      sorterState.savedRanges = getSorterRanges();
+      drawSorter(true);
+      setStatus('Click end point to reverse segment');
+    } else {
+      pushUndo();
+      let a = sorterState.selectedIdx, b = nearIdx;
+      if (a > b) { const t = a; a = b; b = t; }
+      const segment = sorterState.editedPts.slice(a, b + 1).reverse();
+      for (let i = a; i <= b; i++) {
+        sorterState.editedPts[i] = segment[i - a];
+      }
+      sorterState.selectedIdx = null;
+      sorterState.savedRanges = getSorterRanges();
+      drawSorter(true);
+      setStatus('Segment reversed');
+    }
+  } else if (tool === 'delete') {
+    pushUndo();
+    sorterState.editedPts.splice(nearIdx, 1);
+    sorterState.selectedIdx = null;
+    sorterState.savedRanges = getSorterRanges();
+    drawSorter(true);
+    setStatus('Point ' + nearIdx + ' deleted');
+  }
+}
+
+// Raw click handler for placing points anywhere (move tool, second click)
+function handlePlotRawClick(e) {
+  if (sorterState.activeTool !== 'move' || sorterState.selectedIdx === null) return;
+  if (e.button !== 0) return; // left click only
+  // Skip if this is the same click that just selected the point
+  if (sorterState._moveJustSelected) { sorterState._moveJustSelected = false; return; }
+  const plotEl = document.getElementById('sorterPlot');
+  const rect = plotEl.getBoundingClientRect();
+  const pixelX = e.clientX - rect.left;
+  const pixelY = e.clientY - rect.top;
+  const coords = pixelToData(plotEl, pixelX, pixelY);
+  pushUndo();
+  sorterState.editedPts[sorterState.selectedIdx] = { x: coords.x, y: coords.y };
+  sorterState.selectedIdx = null;
+  sorterState.savedRanges = getSorterRanges();
+  drawSorter(true);
+  setStatus('Point moved');
+}
+
+// ===== MIDDLE MOUSE PAN =====
+function setupMiddleMousePan(plotId) {
+  const plotEl = document.getElementById(plotId);
+  let isPanning = false, startX = 0, startY = 0, startXRange = null, startYRange = null;
+
+  plotEl.addEventListener('mousedown', (e) => {
+    if (e.button === 1) {
+      e.preventDefault();
+      isPanning = true;
+      startX = e.clientX;
+      startY = e.clientY;
+      try {
+        const fl = plotEl._fullLayout;
+        startXRange = [...fl.xaxis.range];
+        startYRange = [...fl.yaxis.range];
+      } catch(err) { isPanning = false; }
+    }
+  });
+
+  window.addEventListener('mousemove', (e) => {
+    if (!isPanning) return;
+    e.preventDefault();
+    try {
+      const fl = plotEl._fullLayout;
+      const xLen = fl.xaxis._length;
+      const yLen = fl.yaxis._length;
+      const xRange = startXRange[1] - startXRange[0];
+      const yRange = startYRange[1] - startYRange[0];
+      const dx = (e.clientX - startX) / xLen * xRange;
+      const dy = (e.clientY - startY) / yLen * yRange;
+      Plotly.relayout(plotId, {
+        'xaxis.range': [startXRange[0] - dx, startXRange[1] - dx],
+        'yaxis.range': [startYRange[0] + dy, startYRange[1] + dy]
+      });
+    } catch(err) {}
+  });
+
+  window.addEventListener('mouseup', (e) => {
+    if (e.button === 1) isPanning = false;
+  });
+}
+
+// ===== EXPORT =====
+function exportSorted() {
+  let pts = sorterState.editedPts;
+  if (!pts || pts.length === 0) return;
+
+  const closeCurve = document.getElementById('chkClose').checked;
+  const normalize = document.getElementById('chkNormalize').checked;
+  const extraScale = parseFloat(document.getElementById('extraScale').value) || 1.0;
+
+  // Clone
+  pts = pts.map(p => ({x: p.x, y: p.y}));
+
+  // Close curve
+  if (closeCurve && pts.length > 1) {
+    const first = pts[0], last = pts[pts.length - 1];
+    if (Math.hypot(first.x - last.x, first.y - last.y) > 1e-10) {
+      pts.push({x: first.x, y: first.y});
+    }
+  }
+
+  // Remove duplicates (keep first)
+  const unique = [pts[0]];
+  for (let i = 1; i < pts.length; i++) {
+    const prev = unique[unique.length - 1];
+    if (Math.hypot(pts[i].x - prev.x, pts[i].y - prev.y) > 1e-12) {
+      unique.push(pts[i]);
+    }
+  }
+  pts = unique;
+
+  // Normalize
+  if (normalize) {
+    let leIdx = 0;
+    for (let i = 1; i < pts.length; i++) {
+      if (pts[i].x < pts[leIdx].x) leIdx = i;
+    }
+    const lex = pts[leIdx].x, ley = pts[leIdx].y;
+    for (const p of pts) { p.x -= lex; p.y -= ley; }
+    let teIdx = 0;
+    for (let i = 1; i < pts.length; i++) {
+      if (pts[i].x > pts[teIdx].x) teIdx = i;
+    }
+    const chord = Math.hypot(pts[teIdx].x, pts[teIdx].y);
+    if (chord > 1e-12) {
+      for (const p of pts) { p.x /= chord; p.y /= chord; }
+    }
+  }
+
+  // Extra scale
+  if (extraScale !== 1.0) {
+    for (const p of pts) { p.x *= extraScale; p.y *= extraScale; }
+  }
+
+  // Build text
+  const lines = pts.map(p => {
+    return p.x.toExponential(10) + '\t' + p.y.toExponential(10) + '\t' + (0).toExponential(10);
+  });
+  const text = lines.join('\n') + '\n';
+
+  // Download
+  const baseName = sorterState.fileName.replace(/\.[^.]+$/, '');
+  const fileName = baseName + '_sorted.txt';
+  const blob = new Blob([text], {type: 'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
+  setStatus('Exported ' + fileName);
+}
+
+// ===== CHORD LENGTH DISPLAY =====
+function updateChordLengths() {
+  // Sorter file chord
+  if (sorterState.editedPts && sorterState.editedPts.length > 1) {
+    const xs = sorterState.editedPts.map(p => p.x);
+    const chord = Math.max(...xs) - Math.min(...xs);
+    document.getElementById('chordDefault').textContent = 'Sorter file: ' + chord.toFixed(6);
+  } else if (currentTab === 'compare') {
+    const af = DEFAULT_AIRFOILS[compareState.activeAirfoil];
+    if (af) {
+      const defScale = parseFloat(document.getElementById('defaultScale').value) || 1.0;
+      const chord = Math.max(...af.xs) - Math.min(...af.xs);
+      document.getElementById('chordDefault').textContent = 'Default: ' + chord.toFixed(6) + (defScale !== 1.0 ? ' (scaled: ' + (chord * defScale).toFixed(6) + ')' : '');
+    }
+  } else {
+    document.getElementById('chordDefault').textContent = 'Sorter file: --';
+  }
+
+  // Compare overlay chord
+  if (compareState.overlayPts && compareState.overlayPts.length > 0) {
+    const ovlScale = parseFloat(document.getElementById('overlayScale').value) || 1.0;
+    const ovlXs = compareState.overlayPts.map(p => p.x);
+    const chord = Math.max(...ovlXs) - Math.min(...ovlXs);
+    document.getElementById('chordOverlay').textContent = 'Overlay: ' + chord.toFixed(6) + (ovlScale !== 1.0 ? ' (scaled: ' + (chord * ovlScale).toFixed(6) + ')' : '');
+  } else {
+    document.getElementById('chordOverlay').textContent = 'Overlay: --';
+  }
+
+  // When on compare tab, show default airfoil chord instead of sorter
+  if (currentTab === 'compare') {
+    const af = DEFAULT_AIRFOILS[compareState.activeAirfoil];
+    if (af) {
+      const defScale = parseFloat(document.getElementById('defaultScale').value) || 1.0;
+      const chord = Math.max(...af.xs) - Math.min(...af.xs);
+      document.getElementById('chordDefault').textContent = 'Default: ' + chord.toFixed(6) + (defScale !== 1.0 ? ' (scaled: ' + (chord * defScale).toFixed(6) + ')' : '');
+    }
+  }
+}
+
+// ===== COMPARE TAB =====
+function drawComparer(preserveZoom) {
+  const name = compareState.activeAirfoil;
+  const af = DEFAULT_AIRFOILS[name];
+  if (!af) return;
+
+  const defScale = parseFloat(document.getElementById('defaultScale').value) || 1.0;
+  const ovlScale = parseFloat(document.getElementById('overlayScale').value) || 1.0;
+  const showPts = document.getElementById('chkShowPts').checked;
+  const fill = document.getElementById('chkFill').checked;
+
+  const dxs = af.xs.map(x => x * defScale);
+  const dys = af.ys.map(y => y * defScale);
+
+  updateChordLengths();
+
+  const defaultLabel = document.getElementById('legendDefault').value.trim() || name;
+  const overlayLabel = document.getElementById('legendOverlay').value.trim() || compareState.overlayName;
+
+  const traces = [];
+
+  // Default airfoil
+  traces.push({
+    x: dxs, y: dys,
+    mode: showPts ? 'lines+markers' : 'lines',
+    line: { color: '#3b82f6', width: 2 },
+    marker: { color: '#3b82f6', size: 4 },
+    fill: fill ? 'toself' : 'none',
+    fillcolor: 'rgba(59,130,246,0.15)',
+    name: defaultLabel,
+    hovertemplate: defaultLabel + '<br>x: %{x}<br>y: %{y}<extra></extra>'
+  });
+
+  // Overlay
+  if (compareState.overlayPts) {
+    const oxs = compareState.overlayPts.map(p => p.x * ovlScale);
+    const oys = compareState.overlayPts.map(p => p.y * ovlScale);
+    traces.push({
+      x: oxs, y: oys,
+      mode: showPts ? 'lines+markers' : 'lines',
+      line: { color: '#f59e0b', width: 2 },
+      marker: { color: '#f59e0b', size: 4 },
+      fill: fill ? 'toself' : 'none',
+      fillcolor: 'rgba(245,158,11,0.15)',
+      name: overlayLabel,
+      hovertemplate: overlayLabel + '<br>x: %{x}<br>y: %{y}<extra></extra>'
+    });
+  }
+
+  const tc = getThemeColors();
+  const layout = makePlotLayout();
+  layout.showlegend = true;
+  layout.legend = { 
+    x: 0.02, y: 0.98, // Placed inside top-left 
+    font: { color: tc.font }, 
+    bgcolor: 'rgba(0,0,0,0)', 
+    bordercolor: tc.border, 
+    borderwidth: 1 
+  };
+  layout.title.text = defaultLabel + (compareState.overlayPts ? ' vs ' + overlayLabel : '');
+
+  if (preserveZoom && compareState.savedRanges) {
+    layout.xaxis.range = compareState.savedRanges.xrange;
+    layout.yaxis.range = compareState.savedRanges.yrange;
+    layout.xaxis.autorange = false;
+    layout.yaxis.autorange = false;
+  }
+
+  Plotly.react('comparerPlot', traces, layout, { responsive: true, scrollZoom: true });
+}
+
+function buildAirfoilCards() {
+  const container = document.getElementById('airfoilCards');
+  container.innerHTML = '';
+  for (const name of Object.keys(DEFAULT_AIRFOILS)) {
+    const card = document.createElement('div');
+    card.className = 'card' + (name === compareState.activeAirfoil ? ' active' : '');
+    card.textContent = name;
+    card.addEventListener('click', () => {
+      compareState.activeAirfoil = name;
+      document.querySelectorAll('#airfoilCards .card').forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      compareState.savedRanges = null;
+      drawComparer(false);
+    });
+    container.appendChild(card);
+  }
+}
+
+// ===== TAB SWITCHING =====
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.getElementById('sorterPanel').classList.toggle('active', tab === 'sorter');
+  document.getElementById('comparePanel').classList.toggle('active', tab === 'compare');
+  document.getElementById('sorterPlot').style.display = tab === 'sorter' ? '' : 'none';
+  document.getElementById('comparerPlot').style.display = tab === 'compare' ? '' : 'none';
+  document.getElementById('toolbar').classList.toggle('visible', tab === 'sorter' && sorterState.editedPts !== null);
+
+  if (tab === 'sorter') {
+    Plotly.Plots.resize(document.getElementById('sorterPlot'));
+  } else {
+    Plotly.Plots.resize(document.getElementById('comparerPlot'));
+    drawComparer(true);
+  }
+  updateChordLengths();
+}
+
+function setStatus(msg) {
+  document.getElementById('statusText').textContent = msg;
+}
+
+function toggleTheme() {
+  const root = document.documentElement;
+  const isLight = root.classList.toggle('light');
+  document.getElementById('themeToggle').textContent = isLight ? 'Dark mode' : 'Light mode';
+  // Re-render both plots with new colors
+  if (sorterState.editedPts) {
+    sorterState.savedRanges = getSorterRanges();
+    drawSorter(true);
+  } else {
+    initSorterPlot();
+  }
+  if (currentTab === 'compare') {
+    compareState.savedRanges = getComparerRanges();
+    drawComparer(true);
+  } else {
+    initComparerPlot();
+  }
+}
+
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded', () => {
+  initSorterPlot();
+  initComparerPlot();
+  buildAirfoilCards();
+  drawComparer(false);
+
+  setupMiddleMousePan('sorterPlot');
+  setupMiddleMousePan('comparerPlot');
+
+  // Tab buttons
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+  });
+
+  // Sorter file input
+  const sorterDrop = document.getElementById('sorterDrop');
+  const sorterFile = document.getElementById('sorterFile');
+
+  sorterDrop.addEventListener('dragover', (e) => { e.preventDefault(); sorterDrop.classList.add('dragover'); });
+  sorterDrop.addEventListener('dragleave', () => sorterDrop.classList.remove('dragover'));
+  sorterDrop.addEventListener('drop', (e) => {
+    e.preventDefault();
+    sorterDrop.classList.remove('dragover');
+    if (e.dataTransfer.files.length > 0) loadSorterFile(e.dataTransfer.files[0]);
+  });
+  sorterFile.addEventListener('change', () => {
+    if (sorterFile.files.length > 0) loadSorterFile(sorterFile.files[0]);
+  });
+
+  function loadSorterFile(file) {
+    sorterState.fileName = file.name;
+    document.getElementById('sorterFileName').textContent = file.name;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      sorterState.rawPts = parseAirfoilFile(e.target.result);
+      if (sorterState.rawPts.length === 0) {
+        setStatus('No valid points found');
+        return;
+      }
+      const algo = document.getElementById('sortAlgo').value;
+      sorterState.sortedPts = applySort(sorterState.rawPts, algo);
+      sorterState.editedPts = sorterState.sortedPts.map(p => ({x: p.x, y: p.y}));
+      sorterState.undoStack = [];
+      sorterState.selectedIdx = null;
+      sorterState.savedRanges = null;
+      document.getElementById('btnExport').disabled = false;
+      document.getElementById('toolbar').classList.add('visible');
+      drawSorter(false);
+    };
+    reader.readAsText(file);
+  }
+
+  // Sort algorithm change
+  document.getElementById('sortAlgo').addEventListener('change', () => {
+    if (!sorterState.rawPts) return;
+    const algo = document.getElementById('sortAlgo').value;
+    sorterState.sortedPts = applySort(sorterState.rawPts, algo);
+    sorterState.editedPts = sorterState.sortedPts.map(p => ({x: p.x, y: p.y}));
+    sorterState.undoStack = [];
+    sorterState.selectedIdx = null;
+    sorterState.savedRanges = null;
+    drawSorter(false);
+  });
+
+  // Display options
+  ['chkShowSorterPts', 'chkClose', 'chkIndices', 'chkArrows'].forEach(id => {
+    document.getElementById(id).addEventListener('change', () => {
+      if (sorterState.editedPts) {
+        sorterState.savedRanges = getSorterRanges();
+        drawSorter(true);
+      }
+    });
+  });
+
+  // Export
+  document.getElementById('btnExport').addEventListener('click', exportSorted);
+
+  // Edit tool buttons
+  document.querySelectorAll('#toolbar .tool-btn[data-tool]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tool = btn.dataset.tool;
+      if (sorterState.activeTool === tool) {
+        deactivateTool();
+      } else {
+        activateTool(tool);
+      }
+    });
+  });
+
+  function activateTool(tool) {
+    sorterState.activeTool = tool;
+    sorterState.selectedIdx = null;
+    document.querySelectorAll('#toolbar .tool-btn[data-tool]').forEach(b => {
+      b.classList.toggle('active', b.dataset.tool === tool);
+    });
+    sorterState.savedRanges = getSorterRanges();
+    drawSorter(true);
+    setStatus('Tool: ' + tool + ' - click on a point');
+  }
+
+  function deactivateTool() {
+    sorterState.activeTool = null;
+    sorterState.selectedIdx = null;
+    document.querySelectorAll('#toolbar .tool-btn[data-tool]').forEach(b => b.classList.remove('active'));
+    sorterState.savedRanges = getSorterRanges();
+    drawSorter(true);
+    setStatus('Ready');
+  }
+
+  document.getElementById('btnUndo').addEventListener('click', undo);
+  document.getElementById('btnReset').addEventListener('click', resetEdits);
+
+  // Plotly click handler for edit tools (select point, delete, reverse)
+  document.getElementById('sorterPlot').on('plotly_click', handlePlotClick);
+
+  // Raw click handler for move tool placement (works anywhere on the plot)
+  document.getElementById('sorterPlot').addEventListener('click', handlePlotRawClick);
+
+  // Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (sorterState.selectedIdx !== null) {
+        sorterState.selectedIdx = null;
+        sorterState.savedRanges = getSorterRanges();
+        drawSorter(true);
+        setStatus('Selection cancelled');
+      } else if (sorterState.activeTool) {
+        deactivateTool();
+      }
+    }
+    if (e.ctrlKey && e.key === 'z') {
+      e.preventDefault();
+      undo();
+    }
+  });
+
+  // Compare file input
+  const compareDrop = document.getElementById('compareDrop');
+  const compareFile = document.getElementById('compareFile');
+
+  compareDrop.addEventListener('dragover', (e) => { e.preventDefault(); compareDrop.classList.add('dragover'); });
+  compareDrop.addEventListener('dragleave', () => compareDrop.classList.remove('dragover'));
+  compareDrop.addEventListener('drop', (e) => {
+    e.preventDefault();
+    compareDrop.classList.remove('dragover');
+    if (e.dataTransfer.files.length > 0) loadCompareFile(e.dataTransfer.files[0]);
+  });
+  compareFile.addEventListener('change', () => {
+    if (compareFile.files.length > 0) loadCompareFile(compareFile.files[0]);
+  });
+
+  function loadCompareFile(file) {
+    compareState.overlayName = file.name;
+    document.getElementById('compareFileName').textContent = file.name;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      compareState.overlayPts = parseAirfoilFile(e.target.result);
+      document.getElementById('btnClearOverlay').disabled = false;
+      compareState.savedRanges = null;
+      drawComparer(false);
+    };
+    reader.readAsText(file);
+  }
+
+  document.getElementById('btnClearOverlay').addEventListener('click', () => {
+    compareState.overlayPts = null;
+    compareState.overlayName = '';
+    document.getElementById('compareFileName').textContent = '';
+    document.getElementById('btnClearOverlay').disabled = true;
+    compareState.savedRanges = null;
+    drawComparer(false);
+  });
+
+  // Compare option changes
+  ['defaultScale', 'overlayScale'].forEach(id => {
+    document.getElementById(id).addEventListener('input', () => {
+      compareState.savedRanges = getComparerRanges();
+      drawComparer(true);
+    });
+  });
+  ['chkShowPts', 'chkFill'].forEach(id => {
+    document.getElementById(id).addEventListener('change', () => {
+      compareState.savedRanges = getComparerRanges();
+      drawComparer(true);
+    });
+  });
+
+  // Legend name inputs
+  ['legendDefault', 'legendOverlay'].forEach(id => {
+    document.getElementById(id).addEventListener('input', () => {
+      compareState.savedRanges = getComparerRanges();
+      drawComparer(true);
+    });
+  });
+
+  // Theme toggle
+  document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+
+  // Copy SVG Implementation
+  document.getElementById('btnCopySvg').addEventListener('click', () => {
+    const activePlot = currentTab === 'sorter' ? 'sorterPlot' : 'comparerPlot';
+    Plotly.toImage(activePlot, {format: 'svg'}).then(function(dataUrl) {
+      // Decode the base data URI into raw SVG XML string
+      const svgContent = decodeURIComponent(dataUrl.replace(/^data:image\/svg\+xml,/, ''));
+      navigator.clipboard.writeText(svgContent).then(() => {
+        setStatus('SVG code copied to clipboard!');
+        setTimeout(() => setStatus('Ready'), 2500);
+      }).catch(err => {
+        console.error('Failed to copy: ', err);
+        setStatus('Failed to copy SVG');
+      });
+    });
+  });
+
+  // Prevent middle-click default scroll behavior on plots
+  ['sorterPlot', 'comparerPlot'].forEach(id => {
+    document.getElementById(id).addEventListener('mousedown', (e) => {
+      if (e.button === 1) e.preventDefault();
+    });
+  });
+});
+</script>
+</body>
+</html>

@@ -197,7 +197,7 @@ Documented honestly, in case you're considering building on this:
 
 1. **Domain geometry is hard-coded.** The SolidWorks domain must roughly match the shape described in thesis §3.2.2. Other domains will fail at the meshing step.
 2. **Single-point optimisation only.** The Adjoint Solver optimises for one operating condition. Off-design performance of optimised profiles is typically poor. Multi-point optimisation is achievable with the existing code but requires external scripting to loop across design points.
-3. **2D → 3D verification is a manual workflow.** Optimisation is typically run in 2D first (to avoid left-handed faces caused by minute mesh changes at high boundary-layer resolution), then verified in 3D. The handoff is manual: collect the optimised coordinates from the `.dis` file, rebuild the 3D geometry from them in SolidWorks, then re-run the pipeline on the new geometry. The `.dis` output itself contains unsorted and sometimes-duplicate points; `response_analysis.py` handles the common cases but not all, so the rebuilt geometry often needs cleanup.
+3. **2D → 3D verification is a manual workflow.** Optimisation is typically run in 2D first (to avoid left-handed faces caused by minute mesh changes at high boundary-layer resolution), then verified in 3D. The handoff is manual: collect the optimised coordinates from the `.dis` file, rebuild the 3D geometry from them in SolidWorks, then re-run the pipeline on the new geometry. The `.dis` output itself contains unsorted and sometimes-duplicate points, which need cleaning up before the geometry can be rebuilt — `src/airfoil_tools.html` has a Sorter tab that can help.
 4. **Pressure-based solver across all regimes.** Required by the Adjoint Solver. A density-based solver may be more accurate at supersonic Mach; this was not investigated.
 5. **Surface-area non-dimensionalisation is a known footgun.** Reference values in Fluent must match the scaled chord length, or drag/lift coefficients will be off by a multiple of the chord. Aero-Opt handles this correctly, but if you modify the solver function, verify reference-value scaling manually.
 
@@ -214,9 +214,10 @@ Documented honestly, in case you're considering building on this:
 │   ├── Meshing_Function.py        # mesh() — SpaceClaim → watertight mesh
 │   ├── Solution_Function.py       # solve() — mesh → converged flow solution
 │   ├── Adjoint_Function.py        # optimize() — case → optimised geometry
-│   └── dachis_tools.py            # shared utilities (IO, plotting, file moves)
+│   ├── dachis_tools.py            # shared utilities (IO, plotting, file moves)
+│   └── airfoil_tools.html         # browser tool: plot, scale, sort, and compare airfoil coordinates
 ├── experimental/
-│   └── response_analysis.py       # post-processing of .dis coordinate files
+│   └── response_analysis.py       # experimental Optuna sweep over meshing parameters (did not produce usable results)
 ├── example_files/                 # sample inputs and reference outputs
 │   ├── NACA_0012.scdocx           # sample SpaceClaim geometry (3D)
 │   ├── NACA_0012_2D.scdocx        # sample SpaceClaim geometry (2D)
@@ -230,18 +231,6 @@ Documented honestly, in case you're considering building on this:
 ├── Aero-Opt_thesis.pdf            # full thesis PDF
 └── README.md                      # this file
 ```
-
----
-
-## Troubleshooting
-
-**Fluent launches but nothing happens.** Check Ansys licence availability, particularly Adjoint Solver access. Run `python -c "import ansys.fluent.core; print(ansys.fluent.core.__version__)"` to confirm PyFluent is installed and matches your Fluent version.
-
-**Meshing completes but produces zero-volume cells.** First-layer height too small relative to mesh resolution. Either raise the y⁺ target or decrease `Bl_First_Height`.
-
-**Optimisation diverges after a few iterations.** Orthogonal mesh quality dropped below the threshold after morphing. Thesis §3.2.6 step 21 explains this; reduce `design_change` magnitude, or run the optimisation for fewer iterations and re-mesh.
-
-**"left-handed faces" error.** Minute changes to the mesh during optimisation pushed cells inside-out. Thesis §3.2.6 documents this as the main reason for optimising with coarser 2D meshes before verifying in 3D.
 
 ---
 

@@ -177,50 +177,50 @@ The above are defaults in the functions, so leave the relevant columns blank in 
 
 ## Default values
 
-Every column in `sim_data.xlsx` maps to a keyword argument of the matching function. Leaving a cell blank falls back to the default listed below. These tables are generated from the function signatures in `src/` and mirror Tables 8-16 to 8-18 of the thesis (Appendix D).
+Every column in `sim_data.xlsx` maps to a keyword argument of the matching function. Leaving a cell blank falls back to the default listed below. Parameters and defaults are sourced from the function signatures in `src/`; the Notes column is condensed from the thesis's Appendix D (Tables 8-16 to 8-18).
 
 <details>
 <summary><code>mesh()</code> — <code>src/Meshing_Function.py</code> (37 optional parameters)</summary>
 
-| Parameter | Default |
-|---|---|
-| `nickname` | `''` |
-| `airfoil` | `'not_specified'` |
-| `show_gui` | `False` |
-| `processor_count` | `4` |
-| `precision` | `None` |
-| `chord_len` | `1` |
-| `te_len` | `0.005` |
-| `shut_down_when_done` | `True` |
-| `has_te` | `False` |
-| `upper_name` | `'upper'` |
-| `lower_name` | `'lower'` |
-| `te_name` | `'te'` |
-| `farfield_name` | `'farfield'` |
-| `symmetry_1_name` | `'sym1'` |
-| `symmetry_2_name` | `'sym2'` |
-| `Boi_1` | `True` |
-| `Boi_1_Control_Name` | `'airfoil_max'` |
-| `Boi_1_Execution` | `'Face Size'` |
-| `Boi_1_Size` | `None` |
-| `Boi_2_Control_Name` | `'airfoil_te'` |
-| `Boi_2_Execution` | `'Proximity'` |
-| `Boi_2_Min_Size` | `None` |
-| `Boi_2_Cells_Per_Gap` | `2` |
-| `Boi_2_Scope_To` | `'edges'` |
-| `Surface_Rate` | `1.2` |
-| `Surface_Min_Size` | `None` |
-| `Surface_Max_Size` | `None` |
-| `Surface_Size_Function` | `'Curvature'` |
-| `Surface_Curvature_Normal_Angle` | `12` |
-| `Bl_Control_Name` | `'uniform'` |
-| `Bl_First_Height` | `2e-5` |
-| `Bl_Number_Of_Layers` | `20` |
-| `Bl_Rate` | `1.2` |
-| `Volume_Fill_Type` | `'polyhedra'` |
-| `Volume_Fill_Size` | `None` |
-| `Volume_Fill_Rate` | `1.2` |
-| `Units` | `'m'` |
+| Parameter | Default | Notes |
+|---|---|---|
+| `nickname` | `''` | User-specified identifier appended to output folder names |
+| `airfoil` | `'not_specified'` | Airfoil designation |
+| `show_gui` | `False` | Show the Fluent GUI during meshing |
+| `processor_count` | `4` | Number of logical cores |
+| `precision` | `None` | Single vs double precision; defaults to double if unspecified |
+| `chord_len` | `1` | Chord length in metres |
+| `te_len` | `0.005` | Trailing-edge size in metres |
+| `shut_down_when_done` | `True` | Close Fluent when meshing finishes |
+| `has_te` | `False` | Does the airfoil have an open trailing edge? `False` = closed |
+| `upper_name` | `'upper'` | Upper surface boundary label |
+| `lower_name` | `'lower'` | Lower surface boundary label |
+| `te_name` | `'te'` | Trailing-edge boundary label |
+| `farfield_name` | `'farfield'` | Farfield boundary label |
+| `symmetry_1_name` | `'sym1'` | Symmetry plane 1 label |
+| `symmetry_2_name` | `'sym2'` | Symmetry plane 2 label |
+| `Boi_1` | `True` | Add local sizing to upper/lower surfaces |
+| `Boi_1_Control_Name` | `'airfoil_max'` | Name of the local sizing task |
+| `Boi_1_Execution` | `'Face Size'` | Sizing type for local sizing task |
+| `Boi_1_Size` | `None` | Local sizing size; evaluates to `chord_len / 100` if unspecified |
+| `Boi_2_Control_Name` | `'airfoil_te'` | Name of the local sizing task for the trailing edge |
+| `Boi_2_Execution` | `'Proximity'` | Sizing type for trailing-edge task |
+| `Boi_2_Min_Size` | `None` | Minimum size for trailing-edge task |
+| `Boi_2_Cells_Per_Gap` | `2` | Cells per gap when trailing-edge task is proximity |
+| `Boi_2_Scope_To` | `'edges'` | Scope proximity sizing to edges |
+| `Surface_Rate` | `1.2` | Growth rate of surface mesh |
+| `Surface_Min_Size` | `None` | Surface min size; defaults to `te_len / 2` if `has_te`, else `Bl_First_Height × 10` |
+| `Surface_Max_Size` | `None` | Surface max size; defaults to `chord_len / 2` |
+| `Surface_Size_Function` | `'Curvature'` | Curvature-based mesh sizing |
+| `Surface_Curvature_Normal_Angle` | `12` | Normal angle for curvature, in degrees |
+| `Bl_Control_Name` | `'uniform'` | Boundary-layer type |
+| `Bl_First_Height` | `2e-5` | First boundary-layer height, in metres |
+| `Bl_Number_Of_Layers` | `20` | Number of boundary layers |
+| `Bl_Rate` | `1.2` | Boundary-layer growth rate |
+| `Volume_Fill_Type` | `'polyhedra'` | Volume fill type |
+| `Volume_Fill_Size` | `None` | Volume fill size; defaults to `chord_len / 2` |
+| `Volume_Fill_Rate` | `1.2` | Volume mesh growth rate |
+| `Units` | `'m'` | Metres (standard SI) |
 
 `file_path` is the only required argument. Any `None` default is computed from geometry at runtime.
 
@@ -229,73 +229,73 @@ Every column in `sim_data.xlsx` maps to a keyword argument of the matching funct
 <details>
 <summary><code>solve()</code> — <code>src/Solution_Function.py</code> (65 optional parameters)</summary>
 
-| Parameter | Default |
-|---|---|
-| `nickname` | `''` |
-| `show_gui` | `False` |
-| `processor_count` | `4` |
-| `precision` | `None` |
-| `shut_down_when_done` | `True` |
-| `report_file` | `True` |
-| `report_plot` | `True` |
-| `report_convergence` | `1e-5` |
-| `altitude` | `0` |
-| `mach_num` | `0.6` |
-| `aoa` | `0` |
-| `chord_len` | `1` |
-| `mesh_width` | `0.1` |
-| `convergence_criteria` | `1e-7` |
-| `use_convergence_criteria` | `False` |
-| `use_report_convergence` | `True` |
-| `iterations` | `300` |
-| `time_step_scale` | `5` |
-| `report_1_name` | `'C_d'` |
-| `report_2_name` | `'C_l'` |
-| `operating_pres` | `0` |
-| `solver_type` | `'pressure-based'` |
-| `visc_method` | `'sutherland'` |
-| `visc_model` | `'spalart-allmaras'` |
-| `k_omega_model` | `'geko'` |
-| `curvature_correction` | `False` |
-| `compressibility_effects` | `False` |
-| `farfield_name` | `'farfield'` |
-| `upper_name` | `'upper'` |
-| `lower_name` | `'lower'` |
-| `flux_report_name` | `'flux_report'` |
-| `specification_method` | `'Intensity and Viscosity Ratio'` |
-| `turb_int` | `1` |
-| `turb_visc_ratio` | `1` |
-| `flow_scheme` | `'Coupled'` |
-| `gradient_scheme` | `'least-square-cell-based'` |
-| `density_scheme` | `'second-order-upwind'` |
-| `turb_kin_e_scheme` | `'second-order-upwind'` |
-| `mom_scheme` | `'second-order-upwind'` |
-| `pres_scheme` | `'second-order'` |
-| `energy_scheme` | `'second-order-upwind'` |
-| `spec_diss_rate_scheme` | `'second-order-upwind'` |
-| `mod_turb_visc` | `'second-order-upwind'` |
-| `pseudo_time_method` | `'global-time-step'` |
-| `hybrid_initialize` | `True` |
-| `high_order_term_relax` | `False` |
-| `relaxation_factor` | `0.75` |
-| `courant_number` | `200` |
-| `warped_face_gradient` | `False` |
-| `airfoil` | `'not_specified'` |
-| `symmetry_1_name` | `'sym1'` |
-| `surface_name` | `'surface'` |
-| `contour_lines` | `False` |
-| `smooth_or_banded` | `'banded'` |
-| `generate_mach_cont` | `True` |
-| `generate_pres_cont` | `True` |
-| `generate_yplus` | `True` |
-| `generate_pres_plot` | `True` |
-| `transient` | `False` |
-| `two_d_space` | `'planar'` |
-| `time_step_count` | `10` |
-| `time_step_size` | `0.0001` |
-| `iters_per_time_step` | `20` |
-| `pause_before_solve` | `False` |
-| `under_relaxation` | `0.75` |
+| Parameter | Default | Notes |
+|---|---|---|
+| `nickname` | `''` | User-specified identifier |
+| `show_gui` | `False` | Show the Fluent GUI during the solve |
+| `processor_count` | `4` | Number of logical cores |
+| `precision` | `None` | Single vs double precision; defaults to double if unspecified |
+| `shut_down_when_done` | `True` | Close Fluent when the solve finishes |
+| `report_file` | `True` | Export drag and lift reports to file |
+| `report_plot` | `True` | Generate a plot of drag and lift reports |
+| `report_convergence` | `1e-5` | Convergence threshold for drag/lift reports |
+| `altitude` | `0` | Altitude above sea level, in metres |
+| `mach_num` | `0.6` | Free-stream Mach number |
+| `aoa` | `0` | Angle of attack, in degrees |
+| `chord_len` | `1` | Chord length, in metres |
+| `mesh_width` | `0.1` | Depth of mesh in z, in metres; used for area |
+| `convergence_criteria` | `1e-7` | Convergence threshold for residuals |
+| `use_convergence_criteria` | `False` | Override default residuals with `convergence_criteria` |
+| `use_report_convergence` | `True` | Use report-based convergence as termination |
+| `iterations` | `300` | Maximum number of iterations |
+| `time_step_scale` | `5` | Pseudo-time step scale factor |
+| `report_1_name` | `'C_d'` | Drag coefficient report name |
+| `report_2_name` | `'C_l'` | Lift coefficient report name |
+| `operating_pres` | `0` | Operating gauge pressure, in Pascals |
+| `solver_type` | `'pressure-based'` | Solver algorithm |
+| `visc_method` | `'sutherland'` | Viscosity calculation method |
+| `visc_model` | `'spalart-allmaras'` | Turbulence model |
+| `k_omega_model` | `'geko'` | Sub-model if k-ω is selected |
+| `curvature_correction` | `False` | Apply curvature correction |
+| `compressibility_effects` | `False` | Apply compressibility effects |
+| `farfield_name` | `'farfield'` | Farfield boundary label |
+| `upper_name` | `'upper'` | Upper surface label |
+| `lower_name` | `'lower'` | Lower surface label |
+| `flux_report_name` | `'flux_report'` | Name of the mass-flow report |
+| `specification_method` | `'Intensity and Viscosity Ratio'` | Turbulence specification method |
+| `turb_int` | `1` | Turbulence intensity, % |
+| `turb_visc_ratio` | `1` | Turbulent viscosity ratio |
+| `flow_scheme` | `'Coupled'` | Pressure-velocity coupling method |
+| `gradient_scheme` | `'least-square-cell-based'` | Gradient computation method |
+| `density_scheme` | `'second-order-upwind'` | Density discretisation |
+| `turb_kin_e_scheme` | `'second-order-upwind'` | Turbulent kinetic energy discretisation |
+| `mom_scheme` | `'second-order-upwind'` | Momentum discretisation |
+| `pres_scheme` | `'second-order'` | Pressure discretisation |
+| `energy_scheme` | `'second-order-upwind'` | Energy equation discretisation |
+| `spec_diss_rate_scheme` | `'second-order-upwind'` | Specific dissipation rate discretisation |
+| `mod_turb_visc` | `'second-order-upwind'` | Modified turbulent viscosity discretisation |
+| `pseudo_time_method` | `'global-time-step'` | Pseudo-time method |
+| `hybrid_initialize` | `True` | Use hybrid initialisation (otherwise standard) |
+| `high_order_term_relax` | `False` | Apply high-order term relaxation |
+| `relaxation_factor` | `0.75` | Relaxation factor when high-order relaxation is on |
+| `courant_number` | `200` | Courant number for density-based / transient solves |
+| `warped_face_gradient` | `False` | Apply warped-face gradient correction |
+| `airfoil` | `'not_specified'` | Airfoil identifier |
+| `symmetry_1_name` | `'sym1'` | Symmetry plane 1 label |
+| `surface_name` | `'surface'` | Surface boundary label for 2D meshes |
+| `contour_lines` | `False` | Show contour lines on Mach/pressure plots |
+| `smooth_or_banded` | `'banded'` | Smooth or banded contours |
+| `generate_mach_cont` | `True` | Generate Mach contour plot |
+| `generate_pres_cont` | `True` | Generate pressure contour plot |
+| `generate_yplus` | `True` | Generate y⁺ plot |
+| `generate_pres_plot` | `True` | Generate pressure-distribution plot |
+| `transient` | `False` | Use transient solver (otherwise steady-state) |
+| `two_d_space` | `'planar'` | 2D solution formulation |
+| `time_step_count` | `10` | Number of transient time steps |
+| `time_step_size` | `0.0001` | Transient time-step size, in seconds |
+| `iters_per_time_step` | `20` | Iterations per time step |
+| `pause_before_solve` | `False` | Pause for manual inspection before solving |
+| `under_relaxation` | `0.75` | Under-relaxation factor in the solution-controls panel |
 
 `file_path` is the only required argument. Physical conditions (`altitude`, `mach_num`, `aoa`, `chord_len`) are listed with their defaults above but should almost always be supplied per row.
 
@@ -304,63 +304,63 @@ Every column in `sim_data.xlsx` maps to a keyword argument of the matching funct
 <details>
 <summary><code>optimize()</code> — <code>src/Adjoint_Function.py</code> (55 optional parameters)</summary>
 
-| Parameter | Default |
-|---|---|
-| `nickname` | `''` |
-| `airfoil` | `'not_specified'` |
-| `contour_lines` | `False` |
-| `smooth_or_banded` | `'banded'` |
-| `save_screenshots` | `True` |
-| `transient` | `False` |
-| `solver_type` | `'pressure-based'` |
-| `visc_model` | `'k-omega'` |
-| `show_gui` | `True` |
-| `processor_count` | `4` |
-| `upper_name` | `'upper'` |
-| `lower_name` | `'lower'` |
-| `aoa` | `0` |
-| `convergence_criteria` | `1e-5` |
-| `use_convergence_criteria` | `True` |
-| `use_energy` | `False` |
-| `use_turbulence` | `False` |
-| `use_best_match` | `False` |
-| `apply_preconditioning` | `False` |
-| `target_change` | `10` |
-| `use_percentage` | `True` |
-| `optimize_target` | `'lift-to-drag'` |
-| `mach_num` | `0.5` |
-| `time_step_scale` | `5` |
-| `time_step_size` | `0.001` |
-| `time_step_count` | `100` |
-| `iters_per_time_step` | `20` |
-| `final_iterations` | `300` |
-| `infinite_mode` | `False` |
-| `min_orth_quality_limit` | `0.06` |
-| `maintain_len` | `True` |
-| `adjoint_iterations` | `20` |
-| `optimization_loop_count` | `5` |
-| `pseudo_time_method` | `'off'` |
-| `temp_iterations` | `200` |
-| `temp_time_step_scale` | `None` |
-| `temp_time_step_size` | `None` |
-| `temp_time_step_count` | `10` |
-| `temp_iters_per_time_step` | `20` |
-| `farfield_name` | `'farfield'` |
-| `shut_down_when_done` | `True` |
-| `generate_yplus` | `True` |
-| `generate_pres_plot` | `True` |
-| `report_1_name` | `'C_d'` |
-| `report_2_name` | `'C_l'` |
-| `report_plot` | `True` |
-| `report_file` | `True` |
-| `make_gifs` | `True` |
-| `gif_duration` | `100` |
-| `change_boundary_conditions` | `False` |
-| `altitude` | `0` |
-| `mesh_width` | `0.1` |
-| `infinite_mode_max` | `999` |
-| `custom_mode` | `False` |
-| `custom_path` | `[]` |
+| Parameter | Default | Notes |
+|---|---|---|
+| `nickname` | `''` | User-specified identifier |
+| `airfoil` | `'not_specified'` | Airfoil identifier |
+| `contour_lines` | `False` | Show contour lines on Mach/pressure plots |
+| `smooth_or_banded` | `'banded'` | Smooth or banded contours |
+| `save_screenshots` | `True` | Save screenshots between adjoint iterations |
+| `transient` | `False` | Use a transient solver |
+| `solver_type` | `'pressure-based'` | Applied to the final post-adjoint solve (adjoint itself is pressure-based) |
+| `visc_model` | `'k-omega'` | Viscous model for the final solve (adjoint itself uses k-ω GEKO) |
+| `show_gui` | `True` | Show GUI — on by default so screenshots render |
+| `processor_count` | `4` | Number of logical cores |
+| `upper_name` | `'upper'` | Upper surface label |
+| `lower_name` | `'lower'` | Lower surface label |
+| `aoa` | `0` | Angle of attack, in degrees |
+| `convergence_criteria` | `1e-5` | Convergence threshold for residuals |
+| `use_convergence_criteria` | `True` | Override default convergence with value above |
+| `use_energy` | `False` | Enable energy in the adjoint solver |
+| `use_turbulence` | `False` | Enable turbulence effects in the adjoint solver |
+| `use_best_match` | `False` | Copy flow settings from the solution file into the adjoint solve |
+| `apply_preconditioning` | `False` | Apply preconditioning |
+| `target_change` | `10` | Target design change per adjoint iteration |
+| `use_percentage` | `True` | Treat `target_change` as a percentage |
+| `optimize_target` | `'lift-to-drag'` | Observable to optimise: `lift-to-drag`, `lift`, or `drag` |
+| `mach_num` | `0.5` | Free-stream Mach number |
+| `time_step_scale` | `5` | Pseudo-time step scale factor |
+| `time_step_size` | `0.001` | Transient time-step size, in seconds |
+| `time_step_count` | `100` | Number of transient time steps |
+| `iters_per_time_step` | `20` | Iterations per time step |
+| `final_iterations` | `300` | Iterations for the final post-adjoint solve (thesis: `iterations`) |
+| `infinite_mode` | `False` | Overrides `optimization_loop_count`; loops until mesh quality drops below threshold |
+| `min_orth_quality_limit` | `0.06` | Minimum orthogonal quality for infinite-mode stop |
+| `maintain_len` | `True` | Keep airfoil chord length constant |
+| `adjoint_iterations` | `20` | Iterations of the adjoint solver per loop |
+| `optimization_loop_count` | `5` | Number of adjoint design loops |
+| `pseudo_time_method` | `'off'` | Pseudo-time method (applied during adjoint phase) |
+| `temp_iterations` | `200` | Temporary max iterations while adjoint is running |
+| `temp_time_step_scale` | `None` | Temp pseudo-time step scale; defaults to `0.001` if unspecified |
+| `temp_time_step_size` | `None` | Temp transient time-step size; defaults to `0.001` if unspecified |
+| `temp_time_step_count` | `10` | Temp transient time-step count while adjoint is running |
+| `temp_iters_per_time_step` | `20` | Temp iterations per time step while adjoint is running |
+| `farfield_name` | `'farfield'` | Farfield boundary label |
+| `shut_down_when_done` | `True` | Close Fluent when optimisation finishes |
+| `generate_yplus` | `True` | Generate y⁺ plot |
+| `generate_pres_plot` | `True` | Generate pressure-distribution plot |
+| `report_1_name` | `'C_d'` | Drag report name |
+| `report_2_name` | `'C_l'` | Lift report name |
+| `report_plot` | `True` | Plot drag/lift results |
+| `report_file` | `True` | Export drag/lift reports to file |
+| `make_gifs` | `True` | Build GIFs from mesh/Mach/pressure screenshots |
+| `gif_duration` | `100` | GIF frame duration, in ms |
+| `change_boundary_conditions` | `False` | Change the boundary conditions and re-solve |
+| `altitude` | `0` | Altitude above sea level, in metres, for changed BCs |
+| `mesh_width` | `0.1` | Depth of mesh in z, in metres; used for area |
+| `infinite_mode_max` | `999` | Hard iteration cap for infinite mode |
+| `custom_mode` | `False` | Custom optimisation mode (not in thesis) |
+| `custom_path` | `[]` | User-supplied coordinate path used when `custom_mode=True` (not in thesis) |
 
 `file_path` is the only required argument. `target_change` is interpreted as a percentage when `use_percentage=True`. `solver_type` and `visc_model` are applied only to the final post-adjoint solve — the adjoint solve itself is always pressure-based with the GEKO k-ω model.
 

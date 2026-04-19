@@ -116,7 +116,7 @@ Open `sim_data.xlsx`. Three sheets drive the three scripts:
 | `solution_data` | `solution_table` | `Main_File_Solution.py` |
 | `adjoint_data` | `adjoint_table` | `Main_File_Optimization.py` |
 
-Each row = one simulation. Leave any cell blank to use the function default (see `Appendix D` in the thesis for full default listings).
+Each row = one simulation. Leave any cell blank to use the function default (see [Default values](#default-values) below for the full listing).
 
 Minimum required columns for each stage:
 
@@ -172,6 +172,199 @@ From the thesis's side-trials (§4.6):
 | Optimisation dimension | 2D first, verify in 3D | 3D optimisation is orders of magnitude slower; 2D results validated against 3D solve |
 
 The above are defaults in the functions, so leave the relevant columns blank in the input sheet unless deviating.
+
+---
+
+## Default values
+
+Every column in `sim_data.xlsx` maps to a keyword argument of the matching function. Leaving a cell blank falls back to the default listed below. These tables are generated from the function signatures in `src/` and mirror Tables 8-16 to 8-18 of the thesis (Appendix D).
+
+<details>
+<summary><code>mesh()</code> — <code>src/Meshing_Function.py</code> (37 optional parameters)</summary>
+
+| Parameter | Default |
+|---|---|
+| `nickname` | `''` |
+| `airfoil` | `'not_specified'` |
+| `show_gui` | `False` |
+| `processor_count` | `4` |
+| `precision` | `None` |
+| `chord_len` | `1` |
+| `te_len` | `0.005` |
+| `shut_down_when_done` | `True` |
+| `has_te` | `False` |
+| `upper_name` | `'upper'` |
+| `lower_name` | `'lower'` |
+| `te_name` | `'te'` |
+| `farfield_name` | `'farfield'` |
+| `symmetry_1_name` | `'sym1'` |
+| `symmetry_2_name` | `'sym2'` |
+| `Boi_1` | `True` |
+| `Boi_1_Control_Name` | `'airfoil_max'` |
+| `Boi_1_Execution` | `'Face Size'` |
+| `Boi_1_Size` | `None` |
+| `Boi_2_Control_Name` | `'airfoil_te'` |
+| `Boi_2_Execution` | `'Proximity'` |
+| `Boi_2_Min_Size` | `None` |
+| `Boi_2_Cells_Per_Gap` | `2` |
+| `Boi_2_Scope_To` | `'edges'` |
+| `Surface_Rate` | `1.2` |
+| `Surface_Min_Size` | `None` |
+| `Surface_Max_Size` | `None` |
+| `Surface_Size_Function` | `'Curvature'` |
+| `Surface_Curvature_Normal_Angle` | `12` |
+| `Bl_Control_Name` | `'uniform'` |
+| `Bl_First_Height` | `2e-5` |
+| `Bl_Number_Of_Layers` | `20` |
+| `Bl_Rate` | `1.2` |
+| `Volume_Fill_Type` | `'polyhedra'` |
+| `Volume_Fill_Size` | `None` |
+| `Volume_Fill_Rate` | `1.2` |
+| `Units` | `'m'` |
+
+`file_path` is the only required argument. Any `None` default is computed from geometry at runtime.
+
+</details>
+
+<details>
+<summary><code>solve()</code> — <code>src/Solution_Function.py</code> (65 optional parameters)</summary>
+
+| Parameter | Default |
+|---|---|
+| `nickname` | `''` |
+| `show_gui` | `False` |
+| `processor_count` | `4` |
+| `precision` | `None` |
+| `shut_down_when_done` | `True` |
+| `report_file` | `True` |
+| `report_plot` | `True` |
+| `report_convergence` | `1e-5` |
+| `altitude` | `0` |
+| `mach_num` | `0.6` |
+| `aoa` | `0` |
+| `chord_len` | `1` |
+| `mesh_width` | `0.1` |
+| `convergence_criteria` | `1e-7` |
+| `use_convergence_criteria` | `False` |
+| `use_report_convergence` | `True` |
+| `iterations` | `300` |
+| `time_step_scale` | `5` |
+| `report_1_name` | `'C_d'` |
+| `report_2_name` | `'C_l'` |
+| `operating_pres` | `0` |
+| `solver_type` | `'pressure-based'` |
+| `visc_method` | `'sutherland'` |
+| `visc_model` | `'spalart-allmaras'` |
+| `k_omega_model` | `'geko'` |
+| `curvature_correction` | `False` |
+| `compressibility_effects` | `False` |
+| `farfield_name` | `'farfield'` |
+| `upper_name` | `'upper'` |
+| `lower_name` | `'lower'` |
+| `flux_report_name` | `'flux_report'` |
+| `specification_method` | `'Intensity and Viscosity Ratio'` |
+| `turb_int` | `1` |
+| `turb_visc_ratio` | `1` |
+| `flow_scheme` | `'Coupled'` |
+| `gradient_scheme` | `'least-square-cell-based'` |
+| `density_scheme` | `'second-order-upwind'` |
+| `turb_kin_e_scheme` | `'second-order-upwind'` |
+| `mom_scheme` | `'second-order-upwind'` |
+| `pres_scheme` | `'second-order'` |
+| `energy_scheme` | `'second-order-upwind'` |
+| `spec_diss_rate_scheme` | `'second-order-upwind'` |
+| `mod_turb_visc` | `'second-order-upwind'` |
+| `pseudo_time_method` | `'global-time-step'` |
+| `hybrid_initialize` | `True` |
+| `high_order_term_relax` | `False` |
+| `relaxation_factor` | `0.75` |
+| `courant_number` | `200` |
+| `warped_face_gradient` | `False` |
+| `airfoil` | `'not_specified'` |
+| `symmetry_1_name` | `'sym1'` |
+| `surface_name` | `'surface'` |
+| `contour_lines` | `False` |
+| `smooth_or_banded` | `'banded'` |
+| `generate_mach_cont` | `True` |
+| `generate_pres_cont` | `True` |
+| `generate_yplus` | `True` |
+| `generate_pres_plot` | `True` |
+| `transient` | `False` |
+| `two_d_space` | `'planar'` |
+| `time_step_count` | `10` |
+| `time_step_size` | `0.0001` |
+| `iters_per_time_step` | `20` |
+| `pause_before_solve` | `False` |
+| `under_relaxation` | `0.75` |
+
+`file_path` is the only required argument. Physical conditions (`altitude`, `mach_num`, `aoa`, `chord_len`) are listed with their defaults above but should almost always be supplied per row.
+
+</details>
+
+<details>
+<summary><code>optimize()</code> — <code>src/Adjoint_Function.py</code> (55 optional parameters)</summary>
+
+| Parameter | Default |
+|---|---|
+| `nickname` | `''` |
+| `airfoil` | `'not_specified'` |
+| `contour_lines` | `False` |
+| `smooth_or_banded` | `'banded'` |
+| `save_screenshots` | `True` |
+| `transient` | `False` |
+| `solver_type` | `'pressure-based'` |
+| `visc_model` | `'k-omega'` |
+| `show_gui` | `True` |
+| `processor_count` | `4` |
+| `upper_name` | `'upper'` |
+| `lower_name` | `'lower'` |
+| `aoa` | `0` |
+| `convergence_criteria` | `1e-5` |
+| `use_convergence_criteria` | `True` |
+| `use_energy` | `False` |
+| `use_turbulence` | `False` |
+| `use_best_match` | `False` |
+| `apply_preconditioning` | `False` |
+| `target_change` | `10` |
+| `use_percentage` | `True` |
+| `optimize_target` | `'lift-to-drag'` |
+| `mach_num` | `0.5` |
+| `time_step_scale` | `5` |
+| `time_step_size` | `0.001` |
+| `time_step_count` | `100` |
+| `iters_per_time_step` | `20` |
+| `final_iterations` | `300` |
+| `infinite_mode` | `False` |
+| `min_orth_quality_limit` | `0.06` |
+| `maintain_len` | `True` |
+| `adjoint_iterations` | `20` |
+| `optimization_loop_count` | `5` |
+| `pseudo_time_method` | `'off'` |
+| `temp_iterations` | `200` |
+| `temp_time_step_scale` | `None` |
+| `temp_time_step_size` | `None` |
+| `temp_time_step_count` | `10` |
+| `temp_iters_per_time_step` | `20` |
+| `farfield_name` | `'farfield'` |
+| `shut_down_when_done` | `True` |
+| `generate_yplus` | `True` |
+| `generate_pres_plot` | `True` |
+| `report_1_name` | `'C_d'` |
+| `report_2_name` | `'C_l'` |
+| `report_plot` | `True` |
+| `report_file` | `True` |
+| `make_gifs` | `True` |
+| `gif_duration` | `100` |
+| `change_boundary_conditions` | `False` |
+| `altitude` | `0` |
+| `mesh_width` | `0.1` |
+| `infinite_mode_max` | `999` |
+| `custom_mode` | `False` |
+| `custom_path` | `[]` |
+
+`file_path` is the only required argument. `target_change` is interpreted as a percentage when `use_percentage=True`. `solver_type` and `visc_model` are applied only to the final post-adjoint solve — the adjoint solve itself is always pressure-based with the GEKO k-ω model.
+
+</details>
 
 ---
 

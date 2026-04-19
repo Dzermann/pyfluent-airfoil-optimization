@@ -16,7 +16,7 @@ Given an Excel table of input conditions, Aero-Opt will:
 2. **Solve** the flow field at specified altitude, Mach number, and angle of attack, computing drag and lift coefficients and exporting pressure/Mach contours, residuals, and y⁺ plots.
 3. **Optimise** the airfoil shape using the Ansys Fluent Adjoint Solver, either preserving chord length or allowing it to vary.
 
-Each step is driven from a single row in an Excel input table, so a batch of hundreds of simulations runs unattended.
+Each step is driven from a single row in an Excel input table, so batches of hundreds of simulations can run unattended.
 
 ---
 

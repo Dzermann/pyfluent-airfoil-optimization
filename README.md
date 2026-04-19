@@ -198,8 +198,7 @@ Documented honestly, in case you're considering building on this:
 1. **Domain geometry is hard-coded.** The SolidWorks domain must roughly match the shape described in thesis §3.2.2. Other domains will fail at the meshing step.
 2. **Single-point optimisation only.** The Adjoint Solver optimises for one operating condition. Off-design performance of optimised profiles is typically poor. Multi-point optimisation is achievable with the existing code but requires external scripting to loop across design points.
 3. **2D → 3D verification is a manual workflow.** Optimisation is typically run in 2D first (to avoid left-handed faces caused by minute mesh changes at high boundary-layer resolution), then verified in 3D. The handoff is manual: collect the optimised coordinates from the `.dis` file, rebuild the 3D geometry from them in SolidWorks, then re-run the pipeline on the new geometry. The `.dis` output itself contains unsorted and sometimes-duplicate points, which need cleaning up before the geometry can be rebuilt — `src/airfoil_tools.html` has a Sorter tab that can help.
-4. **Pressure-based solver across all regimes.** Required by the Adjoint Solver. A density-based solver may be more accurate at supersonic Mach; this was not investigated.
-5. **Surface-area non-dimensionalisation is a known footgun.** Reference values in Fluent must match the scaled chord length, or drag/lift coefficients will be off by a multiple of the chord. Aero-Opt handles this correctly, but if you modify the solver function, verify reference-value scaling manually.
+4. **Pressure-based solver during optimisation.** The Adjoint Solver only supports pressure-based solves, so all optimisation runs through it. The standalone `solve()` function exposes density-based as an option (and it may be more accurate at supersonic Mach), but combining density-based solves with adjoint optimisation was not investigated.
 
 ---
 

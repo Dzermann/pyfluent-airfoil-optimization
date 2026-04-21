@@ -4,7 +4,7 @@
 
 Aero-Opt is a Python pipeline that automates meshing, solving, and adjoint-based shape optimisation of 2D/3D airfoils in Ansys Fluent. It was developed as the computational core of a BEng(Hons) thesis at South East Technological University Carlow, and is released here so that other researchers and students can replicate, extend, or adapt the workflow to their own aerodynamic-optimisation problems.
 
-> **Note on authorship.** This README, all files in the `supplementary_tools folder`, and `dachis_tools.py` were made with AI assistance. All other scripts, along with the thesis itself, was written manually by the author. This file is project documentation only, and the AI written code are supplementary materials to the main code. It is not part of the thesis submission, so AI involvement in its prose does not constitute plagiarism under the academic-integrity policy referenced in the thesis.
+> **Note on authorship.** This README and all files in the `supplementary_tools` folder (all `.html` files) are AI written. `dachis_tools.py` was written with AI assistance. All other scripts, along with the thesis itself, were written manually by the author. This file is project documentation only, and the AI written code are supplementary materials to the main code. It is not part of the thesis submission, so AI involvement in its prose does not constitute plagiarism under the academic-integrity policy referenced in the thesis.
 
 ---
 
@@ -390,7 +390,7 @@ Documented honestly, in case you're considering building on this:
 
 1. **Domain geometry is hard-coded.** The SolidWorks domain must roughly match the shape described in thesis §3.2.2. Other domains will fail at the meshing step.
 2. **Single-point optimisation only.** The Adjoint Solver optimises for one operating condition. Off-design performance of optimised profiles is typically poor. Multi-point optimisation is achievable with the existing code but requires external scripting to loop across design points.
-3. **2D → 3D verification is a manual workflow.** Optimisation is typically run in 2D first (to avoid left-handed faces caused by minute mesh changes at high boundary-layer resolution), then verified in 3D. The handoff is manual: collect the optimised coordinates from the `.dis` file, rebuild the 3D geometry from them in SolidWorks, then re-run the pipeline on the new geometry. The `.dis` output itself contains unsorted and sometimes-duplicate points, which need cleaning up before the geometry can be rebuilt — `src/airfoil_tools.html` has a Sorter tab that can help.
+3. **2D → 3D verification is a manual workflow.** Optimisation is typically run in 2D first (to avoid left-handed faces caused by minute mesh changes at high boundary-layer resolution), then verified in 3D. The handoff is manual: collect the optimised coordinates from the `.dis` file, rebuild the 3D geometry from them in SolidWorks, then re-run the pipeline on the new geometry. The `.dis` output itself contains unsorted and sometimes-duplicate points, which need cleaning up before the geometry can be rebuilt — `supplementary_tools/airfoil_tools.html` has a Sorter tab that can help.
 4. **Pressure-based solver during optimisation.** The Adjoint Solver only supports pressure-based solves, so all optimisation runs through it. The standalone `solve()` function exposes density-based as an option (and it may be more accurate at supersonic Mach), but combining density-based solves with adjoint optimisation was not investigated.
 
 ---
@@ -406,8 +406,11 @@ Documented honestly, in case you're considering building on this:
 │   ├── Meshing_Function.py        # mesh() — SpaceClaim → watertight mesh
 │   ├── Solution_Function.py       # solve() — mesh → converged flow solution
 │   ├── Adjoint_Function.py        # optimize() — case → optimised geometry
-│   ├── dachis_tools.py            # shared utilities (IO, plotting, file moves)
-│   └── airfoil_tools.html         # browser tool: plot, scale, sort, and compare airfoil coordinates
+│   └── dachis_tools.py            # shared utilities (IO, plotting, file moves) [written with AI assistance]
+├── supplementary_tools/                   # [all .html files in this folder are AI written]
+│   ├── airfoil_tools.html                 # browser tool: plot, scale, sort, and compare airfoil coordinates [AI written]
+│   ├── first_layer_height_calculator.html # browser tool: calculate first boundary-layer heights from target y⁺ [AI written]
+│   └── chart_studio.html                  # browser tool: make charts [AI written]
 ├── experimental/
 │   └── response_analysis.py       # experimental Optuna sweep over meshing parameters (did not produce usable results)
 ├── example_files/                 # sample inputs and reference outputs

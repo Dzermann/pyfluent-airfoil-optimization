@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>First Layer Height Calculator</title>
+<style>
+  :root {
+    --bg: #f5f5f7;
+    --surface: #ffffff;
+    --text-primary: #1d1d1f;
+    --text-secondary: #86868b;
+    --text-tertiary: #aeaeb2;
+    --accent: #007AFF;
+    --accent-hover: #0066d6;
+    --accent-active: #0055b3;
+    --grid: #d5d5d8;
+    --grid-strong: #b0b0b4;
+    --header-bg: #f0f0f3;
+    --highlight-bg: rgba(0, 122, 255, 0.08);
+    --red: #ff3b30;
+    --green: #34c759;
+    --shadow-md: 0 4px 14px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.04);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #000000;
+      --surface: #1c1c1e;
+      --text-primary: #f5f5f7;
+      --text-secondary: #98989d;
+      --text-tertiary: #636366;
+      --grid: #38383a;
+      --grid-strong: #545456;
+      --header-bg: #2c2c2e;
+      --highlight-bg: rgba(0, 122, 255, 0.15);
+      --shadow-md: 0 4px 14px rgba(0,0,0,0.4);
+    }
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
+                 "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 48px 24px 80px;
+  }
+
+  .container { width: 100%; max-width: 1200px; }
+
+  .header { text-align: center; margin-bottom: 20px; }
+  .header h1 { font-size: 34px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 4px; }
+  .header p { font-size: 17px; color: var(--text-secondary); }
+
+  /* ── Tabs ── */
+  .tab-bar {
+    display: flex;
+    gap: 0;
+    margin-bottom: 0;
+    border-bottom: 1px solid var(--grid);
+  }
+  .tab-btn {
+    padding: 10px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    color: var(--text-secondary);
+    background: var(--header-bg);
+    border: 1px solid var(--grid);
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    cursor: pointer;
+    transition: color 0.15s, background 0.15s;
+    margin-right: -1px;
+    position: relative;
+    top: 1px;
+  }
+  .tab-btn:hover { color: var(--text-primary); }
+  .tab-btn.active {
+    color: var(--accent);
+    background: var(--surface);
+    border-bottom: 1px solid var(--surface);
+  }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  .toolbar {
+    display: flex; align-items: center; justify-content: flex-end;
+    margin: 8px 0; gap: 8px;
+  }
+  .toolbar .btn {
+    padding: 6px 14px; font-size: 13px; font-weight: 600;
+    font-family: inherit; border: none; border-radius: 6px;
+    cursor: pointer; transition: background 0.15s;
+  }
+  .btn-danger { color: var(--red); background: rgba(255,59,48,0.08); }
+  .btn-danger:hover { background: rgba(255,59,48,0.14); }
+
+  .sheet {
+    background: var(--surface);
+    border: 1px solid var(--grid);
+    box-shadow: var(--shadow-md);
+    overflow-x: auto;
+  }
+
+  table {
+    width: 100%; border-collapse: collapse;
+    font-variant-numeric: tabular-nums; table-layout: auto;
+  }
+
+  th, td {
+    padding: 0; text-align: right; white-space: nowrap;
+    font-size: 13px; border: 1px solid var(--grid);
+    height: 28px; vertical-align: middle;
+  }
+
+  th {
+    font-weight: 600; font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.2px; color: var(--text-secondary);
+    background: var(--header-bg); padding: 0 10px;
+    position: sticky; top: 0; z-index: 2;
+    border-bottom: 2px solid var(--grid-strong); user-select: none;
+  }
+
+  th.row-num-col, td.row-num-col {
+    text-align: center; width: 36px; min-width: 36px;
+    background: var(--header-bg); color: var(--text-secondary);
+    font-weight: 500; font-size: 12px; cursor: pointer;
+    user-select: none; padding: 0 4px;
+  }
+  td.row-num-col { color: var(--text-tertiary); }
+
+  th.del-col, td.del-col {
+    width: 28px; min-width: 28px; text-align: center; background: var(--header-bg);
+    border-right: 2px solid var(--grid-strong);
+  }
+
+  td { padding: 0 8px; }
+
+  td.input-col { padding: 0; background: var(--surface); position: relative; }
+
+  th.input-col { background: var(--header-bg); }
+  th.ds-col { color: var(--accent); background: var(--header-bg); }
+  .ds-col { font-weight: 600; color: var(--accent); }
+
+  table input[type="number"] {
+    display: block; width: 100%; height: 100%;
+    padding: 0 8px; font-size: 13px; font-family: inherit;
+    font-variant-numeric: tabular-nums; color: var(--text-primary);
+    background: transparent; border: none; border-radius: 0;
+    text-align: right; outline: none; -moz-appearance: textfield;
+    line-height: 28px; caret-color: transparent;
+  }
+  table input[type="number"]::-webkit-inner-spin-button,
+  table input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none; margin: 0;
+  }
+  table input[type="number"]::placeholder { color: var(--text-tertiary); }
+
+  td.input-col.cell-selected {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+    z-index: 1;
+  }
+  td.input-col.cell-editing {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+    z-index: 1;
+  }
+  td.input-col.cell-editing input { caret-color: var(--text-primary); }
+
+  table input[type="number"].error {
+    background: rgba(255,59,48,0.06); color: var(--red);
+  }
+
+  .row-delete {
+    background: none; border: none; cursor: pointer;
+    color: var(--text-tertiary); font-size: 14px;
+    padding: 0; line-height: 28px; width: 100%; transition: color 0.15s;
+  }
+  .row-delete:hover { color: var(--red); }
+
+  tr.selected td { background: var(--highlight-bg); }
+  tr.selected td.row-num-col { color: var(--accent); font-weight: 700; background: var(--highlight-bg); }
+  tr.selected td.input-col { background: var(--highlight-bg); }
+
+  .ds-header { white-space: nowrap; }
+  .copy-col-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    background: none; border: 1px solid var(--grid); border-radius: 4px;
+    padding: 2px 3px; cursor: pointer; color: var(--text-tertiary);
+    vertical-align: middle; margin-left: 3px;
+    transition: color 0.15s, background 0.15s, border-color 0.15s;
+  }
+  .copy-col-btn:hover { color: var(--accent); background: var(--highlight-bg); border-color: var(--accent); }
+  .copy-col-btn.copied { color: var(--green); border-color: var(--green); background: rgba(52,199,89,0.08); }
+
+  .empty-cell { color: var(--text-tertiary); }
+
+  .footer { text-align: center; margin-top: 20px; font-size: 12px; color: var(--text-tertiary); }
+
+  .formulas {
+    margin-top: 12px;
+    padding: 14px 16px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+  }
+
+  @media (max-width: 700px) {
+    body { padding: 24px 8px 60px; }
+    .header h1 { font-size: 26px; }
+    th, td { font-size: 11px; }
+    table input[type="number"] { font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1>First Layer Height</h1>
+    <p>CFD mesh generation tools</p>
+  </div>
+
+  <!-- Tab bar -->
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('flh')">First Layer Height</button>
+    <button class="tab-btn" onclick="switchTab('dist')">Distance Calculator</button>
+  </div>
+
+  <!-- ═══════════ TAB 1: First Layer Height ═══════════ -->
+  <div class="tab-panel active" id="tab-flh">
+    <div class="toolbar">
+      <button class="btn btn-danger" onclick="flh.clearAll()">Clear All</button>
+    </div>
+    <div class="sheet">
+      <table>
+        <thead>
+          <tr>
+            <th class="row-num-col">#</th>
+            <th class="del-col"></th>
+            <th class="input-col">Altitude (m)</th>
+            <th class="input-col">Ref Length (m)</th>
+            <th class="input-col">Mach</th>
+            <th class="input-col">y<sup>+</sup></th>
+            <th class="ds-col ds-header">&Delta;s (m) <button class="copy-col-btn" onclick="copyColumn('ds_m','flhBody')" title="Copy column"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5.5" y="5.5" width="8" height="8" rx="1"/><path d="M5.5 10.5h-1a1.5 1.5 0 01-1.5-1.5v-5a1.5 1.5 0 011.5-1.5h5a1.5 1.5 0 011.5 1.5v1"/></svg></button></th>
+            <th class="ds-col ds-header">&Delta;s (mm) <button class="copy-col-btn" onclick="copyColumn('ds_mm','flhBody')" title="Copy column"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5.5" y="5.5" width="8" height="8" rx="1"/><path d="M5.5 10.5h-1a1.5 1.5 0 01-1.5-1.5v-5a1.5 1.5 0 011.5-1.5h5a1.5 1.5 0 011.5 1.5v1"/></svg></button></th>
+            <th>Re<sub>x</sub></th>
+            <th>C<sub>f</sub></th>
+            <th>&tau;<sub>wall</sub> (Pa)</th>
+            <th>U<sub>fric</sub> (m/s)</th>
+            <th>T (K)</th>
+            <th>&rho; (kg/m&sup3;)</th>
+            <th>&mu; (Pa&middot;s)</th>
+          </tr>
+        </thead>
+        <tbody id="flhBody"></tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- ═══════════ TAB 2: Distance Calculator ═══════════ -->
+  <div class="tab-panel" id="tab-dist">
+    <div class="toolbar">
+      <button class="btn btn-danger" onclick="dist.clearAll()">Clear All</button>
+    </div>
+    <div class="sheet">
+      <table>
+        <thead>
+          <tr>
+            <th class="row-num-col">#</th>
+            <th class="del-col"></th>
+            <th class="input-col">&Delta;s (m)</th>
+            <th class="input-col">Growth Rate</th>
+            <th class="input-col">Layers</th>
+            <th class="ds-col ds-header">Total (m) <button class="copy-col-btn" onclick="copyColumn('total_m','distBody')" title="Copy column"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5.5" y="5.5" width="8" height="8" rx="1"/><path d="M5.5 10.5h-1a1.5 1.5 0 01-1.5-1.5v-5a1.5 1.5 0 011.5-1.5h5a1.5 1.5 0 011.5 1.5v1"/></svg></button></th>
+            <th class="ds-col ds-header">Total (mm) <button class="copy-col-btn" onclick="copyColumn('total_mm','distBody')" title="Copy column"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5.5" y="5.5" width="8" height="8" rx="1"/><path d="M5.5 10.5h-1a1.5 1.5 0 01-1.5-1.5v-5a1.5 1.5 0 011.5-1.5h5a1.5 1.5 0 011.5 1.5v1"/></svg></button></th>
+            <th>Last Layer (m)</th>
+            <th>Expansion Ratio</th>
+          </tr>
+        </thead>
+        <tbody id="distBody"></tbody>
+      </table>
+    </div>
+
+    <div class="formulas">
+      <p>Total Height = &Delta;s &times; (r<sup>n</sup> &minus; 1) / (r &minus; 1), where &Delta;s is the first layer height, r is the growth rate, and n is the number of layers. When r = 1, Total Height = &Delta;s &times; n. The last layer height is &Delta;s &times; r<sup>n&minus;1</sup>, and the expansion ratio is the last layer divided by the first.</p>
+    </div>
+  </div>
+
+  <div class="footer">Formulas from Solution_Function.py &mdash; Dachi Dzeria</div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════
+//  SHARED — tab switching, cell nav engine, helpers
+// ══════════════════════════════════════════════════════
+
+let activeTab = 'flh';
+let editMode = false;
+let selectionAnchorIdx = null;
+let lastClickedRowIdx = null;
+
+function switchTab(tab) {
+  exitEdit();
+  clearCellSelection();
+  activeTab = tab;
+  document.querySelectorAll('.tab-btn').forEach((btn, i) => {
+    btn.classList.toggle('active', (i === 0 && tab === 'flh') || (i === 1 && tab === 'dist'));
+  });
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+}
+
+function getActiveTbody() {
+  return document.getElementById(activeTab === 'flh' ? 'flhBody' : 'distBody');
+}
+
+function fmt(val) {
+  if (Math.abs(val) < 0.01 || Math.abs(val) >= 1e6) return val.toExponential(4);
+  return val.toFixed(4);
+}
+
+function getRowIndex(tr) {
+  return Array.from(tr.closest('tbody').rows).indexOf(tr);
+}
+
+// ── Cell selection engine (shared) ──
+
+function clearCellSelection() {
+  document.querySelectorAll('td.cell-selected, td.cell-editing').forEach(td => {
+    td.classList.remove('cell-selected', 'cell-editing');
+  });
+}
+
+function selectCell(td) {
+  if (!td || !td.classList.contains('input-col')) return;
+  exitEdit();
+  clearCellSelection();
+  td.classList.add('cell-selected');
+  const input = td.querySelector('input');
+  if (input) input.focus();
+  editMode = false;
+}
+
+function getSelectedCell() {
+  return document.querySelector('td.cell-selected, td.cell-editing');
+}
+
+function enterEdit(td, clearContent) {
+  if (!td) return;
+  td.classList.remove('cell-selected');
+  td.classList.add('cell-editing');
+  editMode = true;
+  const input = td.querySelector('input');
+  if (input) {
+    if (clearContent) input.value = '';
+    input.focus();
+    input.selectionStart = input.selectionEnd = input.value.length;
+  }
+}
+
+function exitEdit() {
+  const td = document.querySelector('td.cell-editing');
+  if (td) {
+    td.classList.remove('cell-editing');
+    td.classList.add('cell-selected');
+    const tr = td.closest('tr');
+    if (tr) triggerRowCompute(tr);
+  }
+  editMode = false;
+}
+
+function triggerRowCompute(tr) {
+  const tbody = tr.closest('tbody');
+  if (tbody.id === 'flhBody') {
+    if (flh.rowHasAllRequired(tr)) flh.computeRow(tr);
+    else flh.clearOutputs(tr);
+    flh.ensureEmptyLastRow();
+  } else if (tbody.id === 'distBody') {
+    if (dist.rowHasAllRequired(tr)) dist.computeRow(tr);
+    else dist.clearOutputs(tr);
+    dist.ensureEmptyLastRow();
+  }
+}
+
+function getInputColIndices(tr) {
+  const indices = [];
+  Array.from(tr.cells).forEach((td, i) => { if (td.classList.contains('input-col')) indices.push(i); });
+  return indices;
+}
+
+function navigateTo(tbody, rowIdx, colIdx) {
+  if (rowIdx < 0 || rowIdx >= tbody.rows.length) return;
+  const tr = tbody.rows[rowIdx];
+  const td = tr.cells[colIdx];
+  if (td && td.classList.contains('input-col')) selectCell(td);
+}
+
+function clearRowSelection() {
+  document.querySelectorAll('tr.selected').forEach(tr => tr.classList.remove('selected'));
+}
+
+function getSelectedRows() {
+  const tbody = getActiveTbody();
+  return Array.from(tbody.querySelectorAll('tr.selected'));
+}
+
+function isRowEmpty(tr) {
+  return Array.from(tr.querySelectorAll('input')).every(el => el.value.trim() === '');
+}
+
+// ── Copy column ──
+function copyColumn(field, tbodyId) {
+  const rows = document.getElementById(tbodyId).rows;
+  const values = [];
+  for (const tr of rows) {
+    const cell = tr.querySelector(`[data-out="${field}"]`);
+    if (cell && !cell.classList.contains('empty-cell')) values.push(cell.textContent);
+  }
+  if (values.length === 0) return;
+  navigator.clipboard.writeText(values.join('\n')).then(() => {
+    event.target.closest('.copy-col-btn').classList.add('copied');
+    setTimeout(() => { try { event.target.closest('.copy-col-btn').classList.remove('copied'); } catch(e){} }, 1200);
+  });
+}
+
+
+// ══════════════════════════════════════════════════════
+//  TAB 1: First Layer Height
+// ══════════════════════════════════════════════════════
+
+const flh = {
+  rowCount: 0,
+
+  makeRowHTML(id) {
+    return `
+      <td class="row-num-col">${id}</td>
+      <td class="del-col"><button class="row-delete" onclick="flh.deleteRow(this)" title="Remove row">&times;</button></td>
+      <td class="input-col"><input type="number" step="any" min="0" placeholder="0" data-field="alt"></td>
+      <td class="input-col"><input type="number" step="any" min="0.001" placeholder="1.0" data-field="chord"></td>
+      <td class="input-col"><input type="number" step="any" min="0.001" placeholder="0.6" data-field="mach"></td>
+      <td class="input-col"><input type="number" step="any" min="0.001" placeholder="1" data-field="yp"></td>
+      <td class="ds-col empty-cell" data-out="ds_m">&mdash;</td>
+      <td class="ds-col empty-cell" data-out="ds_mm">&mdash;</td>
+      <td class="empty-cell" data-out="re">&mdash;</td>
+      <td class="empty-cell" data-out="cf">&mdash;</td>
+      <td class="empty-cell" data-out="tau">&mdash;</td>
+      <td class="empty-cell" data-out="uf">&mdash;</td>
+      <td class="empty-cell" data-out="temp">&mdash;</td>
+      <td class="empty-cell" data-out="rho">&mdash;</td>
+      <td class="empty-cell" data-out="mu">&mdash;</td>
+    `;
+  },
+
+  addRow(sel) {
+    this.rowCount++;
+    const tr = document.createElement('tr');
+    tr.innerHTML = this.makeRowHTML(this.rowCount);
+    document.getElementById('flhBody').appendChild(tr);
+    if (sel) selectCell(tr.querySelector('td.input-col'));
+  },
+
+  ensureEmptyLastRow() {
+    const tbody = document.getElementById('flhBody');
+    const last = tbody.rows[tbody.rows.length - 1];
+    if (!last || !isRowEmpty(last)) this.addRow(false);
+  },
+
+  deleteRow(btn) {
+    const tbody = document.getElementById('flhBody');
+    if (tbody.rows.length <= 1) return;
+    btn.closest('tr').remove();
+    this.renumber();
+    this.ensureEmptyLastRow();
+  },
+
+  clearAll() {
+    exitEdit();
+    document.getElementById('flhBody').innerHTML = '';
+    this.rowCount = 0;
+    this.addRow(false);
+  },
+
+  renumber() {
+    const rows = document.getElementById('flhBody').rows;
+    for (let i = 0; i < rows.length; i++) rows[i].cells[0].textContent = i + 1;
+    this.rowCount = rows.length;
+  },
+
+  clearOutputs(tr) {
+    tr.querySelectorAll('[data-out]').forEach(el => {
+      el.textContent = '\u2014';
+      el.classList.add('empty-cell');
+      if (el.dataset.out === 'ds_m' || el.dataset.out === 'ds_mm') el.className = 'ds-col empty-cell';
+    });
+  },
+
+  rowHasAllRequired(tr) {
+    const mach = parseFloat(tr.querySelector('[data-field="mach"]').value);
+    const alt = parseFloat(tr.querySelector('[data-field="alt"]').value);
+    const yp = parseFloat(tr.querySelector('[data-field="yp"]').value);
+    return !isNaN(mach) && mach > 0 && !isNaN(alt) && alt >= 0 && !isNaN(yp) && yp > 0;
+  },
+
+  computeRow(tr) {
+    const get = f => tr.querySelector(`[data-field="${f}"]`);
+    const out = n => tr.querySelector(`[data-out="${n}"]`);
+    tr.querySelectorAll('input').forEach(el => el.classList.remove('error'));
+
+    const machEl = get('mach'), altEl = get('alt'), ypEl = get('yp'), chordEl = get('chord');
+    const mach = parseFloat(machEl.value);
+    const altitude = parseFloat(altEl.value);
+    const yPlus = parseFloat(ypEl.value);
+    const chord = chordEl.value.trim() === '' ? 1.0 : parseFloat(chordEl.value);
+
+    let valid = true;
+    if (isNaN(mach) || mach <= 0) { machEl.classList.add('error'); valid = false; }
+    if (isNaN(altitude) || altitude < 0) { altEl.classList.add('error'); valid = false; }
+    if (isNaN(yPlus) || yPlus <= 0) { ypEl.classList.add('error'); valid = false; }
+    if (isNaN(chord) || chord <= 0) { chordEl.classList.add('error'); valid = false; }
+    if (!valid) { this.clearOutputs(tr); return; }
+
+    const alpha = 0.0065, T0 = 288.15, g = 9.80665;
+    const R_spec = 8.31432 / 0.028964420;
+    const rho0 = 1.225, gamma = 1.4, mew0 = 0.00001789, S = 110;
+
+    const temperature = T0 - altitude * alpha;
+    const density = rho0 * Math.pow((T0 - alpha * altitude) / T0, (g / (R_spec * alpha)) - 1);
+    const sos = Math.sqrt(temperature * R_spec * gamma);
+    const velocity = sos * mach;
+    const mu = mew0 * Math.pow(temperature / T0, 1.5) * (T0 + S) / (temperature + S);
+    const Re_x = (density * velocity * chord) / mu;
+    const C_f = 0.026 / Math.pow(Re_x, 1 / 7);
+    const tauWall = (C_f * density * velocity * velocity) / 2;
+    const U_fric = Math.sqrt(tauWall / density);
+    const deltaS = (yPlus * mu) / (U_fric * density);
+
+    const set = (name, val, cls) => { const el = out(name); el.textContent = val; el.classList.remove('empty-cell'); if (cls) el.className = cls; };
+    set('ds_m', deltaS.toExponential(4), 'ds-col');
+    set('ds_mm', (deltaS * 1000).toExponential(4), 'ds-col');
+    set('re', Re_x.toExponential(4));
+    set('cf', C_f.toExponential(4));
+    set('tau', tauWall.toExponential(4));
+    set('uf', U_fric.toExponential(4));
+    set('temp', fmt(temperature));
+    set('rho', fmt(density));
+    set('mu', mu.toExponential(4));
+  },
+
+  getFields() { return ['alt', 'chord', 'mach', 'yp']; }
+};
+
+
+// ══════════════════════════════════════════════════════
+//  TAB 2: Distance Calculator
+// ══════════════════════════════════════════════════════
+
+const dist = {
+  rowCount: 0,
+
+  makeRowHTML(id) {
+    return `
+      <td class="row-num-col">${id}</td>
+      <td class="del-col"><button class="row-delete" onclick="dist.deleteRow(this)" title="Remove row">&times;</button></td>
+      <td class="input-col"><input type="number" step="any" min="0" placeholder="2.03e-6" data-field="ds"></td>
+      <td class="input-col"><input type="number" step="any" min="1" placeholder="1.2" data-field="gr"></td>
+      <td class="input-col"><input type="number" step="1" min="1" placeholder="20" data-field="nl"></td>
+      <td class="ds-col empty-cell" data-out="total_m">&mdash;</td>
+      <td class="ds-col empty-cell" data-out="total_mm">&mdash;</td>
+      <td class="empty-cell" data-out="last_layer">&mdash;</td>
+      <td class="empty-cell" data-out="exp_ratio">&mdash;</td>
+    `;
+  },
+
+  addRow(sel) {
+    this.rowCount++;
+    const tr = document.createElement('tr');
+    tr.innerHTML = this.makeRowHTML(this.rowCount);
+    document.getElementById('distBody').appendChild(tr);
+    if (sel) selectCell(tr.querySelector('td.input-col'));
+  },
+
+  ensureEmptyLastRow() {
+    const tbody = document.getElementById('distBody');
+    const last = tbody.rows[tbody.rows.length - 1];
+    if (!last || !isRowEmpty(last)) this.addRow(false);
+  },
+
+  deleteRow(btn) {
+    const tbody = document.getElementById('distBody');
+    if (tbody.rows.length <= 1) return;
+    btn.closest('tr').remove();
+    this.renumber();
+    this.ensureEmptyLastRow();
+  },
+
+  clearAll() {
+    exitEdit();
+    document.getElementById('distBody').innerHTML = '';
+    this.rowCount = 0;
+    this.addRow(false);
+  },
+
+  renumber() {
+    const rows = document.getElementById('distBody').rows;
+    for (let i = 0; i < rows.length; i++) rows[i].cells[0].textContent = i + 1;
+    this.rowCount = rows.length;
+  },
+
+  clearOutputs(tr) {
+    tr.querySelectorAll('[data-out]').forEach(el => {
+      el.textContent = '\u2014';
+      el.classList.add('empty-cell');
+      if (el.dataset.out === 'total_m' || el.dataset.out === 'total_mm') el.className = 'ds-col empty-cell';
+    });
+  },
+
+  rowHasAllRequired(tr) {
+    const ds = parseFloat(tr.querySelector('[data-field="ds"]').value);
+    const gr = parseFloat(tr.querySelector('[data-field="gr"]').value);
+    const nl = parseFloat(tr.querySelector('[data-field="nl"]').value);
+    return !isNaN(ds) && ds > 0 && !isNaN(gr) && gr >= 1 && !isNaN(nl) && nl >= 1 && Number.isInteger(nl);
+  },
+
+  computeRow(tr) {
+    const get = f => tr.querySelector(`[data-field="${f}"]`);
+    const out = n => tr.querySelector(`[data-out="${n}"]`);
+    tr.querySelectorAll('input').forEach(el => el.classList.remove('error'));
+
+    const dsEl = get('ds'), grEl = get('gr'), nlEl = get('nl');
+    const ds = parseFloat(dsEl.value);
+    const gr = parseFloat(grEl.value);
+    const nl = parseInt(nlEl.value, 10);
+
+    let valid = true;
+    if (isNaN(ds) || ds <= 0) { dsEl.classList.add('error'); valid = false; }
+    if (isNaN(gr) || gr < 1) { grEl.classList.add('error'); valid = false; }
+    if (isNaN(nl) || nl < 1) { nlEl.classList.add('error'); valid = false; }
+    if (!valid) { this.clearOutputs(tr); return; }
+
+    // Geometric series: total = ds * (gr^nl - 1) / (gr - 1) when gr != 1
+    let total;
+    if (Math.abs(gr - 1) < 1e-12) {
+      total = ds * nl;
+    } else {
+      total = ds * (Math.pow(gr, nl) - 1) / (gr - 1);
+    }
+    const lastLayer = ds * Math.pow(gr, nl - 1);
+    const expRatio = lastLayer / ds;
+
+    const set = (name, val, cls) => { const el = out(name); el.textContent = val; el.classList.remove('empty-cell'); if (cls) el.className = cls; };
+    set('total_m', total.toExponential(4), 'ds-col');
+    set('total_mm', (total * 1000).toExponential(4), 'ds-col');
+    set('last_layer', lastLayer.toExponential(4));
+    set('exp_ratio', fmt(expRatio));
+  },
+
+  getFields() { return ['ds', 'gr', 'nl']; }
+};
+
+
+// ══════════════════════════════════════════════════════
+//  SHARED EVENT HANDLERS
+// ══════════════════════════════════════════════════════
+
+function getActiveCtx() {
+  return activeTab === 'flh' ? flh : dist;
+}
+
+// ── Click → select / edit cell ──
+document.addEventListener('mousedown', e => {
+  const td = e.target.closest('td');
+  if (!td) return;
+  const tr = td.closest('tr');
+  const tbody = tr.closest('tbody');
+  if (!tbody || (tbody.id !== 'flhBody' && tbody.id !== 'distBody')) return;
+
+  const cellIdx = Array.from(tr.cells).indexOf(td);
+
+  // Row number column → row selection
+  if (td.classList.contains('row-num-col')) {
+    e.preventDefault();
+    exitEdit(); clearCellSelection();
+    const rowIdx = getRowIndex(tr);
+    if (e.shiftKey && lastClickedRowIdx !== null) {
+      clearRowSelection();
+      const start = Math.min(lastClickedRowIdx, rowIdx);
+      const end = Math.max(lastClickedRowIdx, rowIdx);
+      for (let i = start; i <= end; i++) tbody.rows[i].classList.add('selected');
+    } else if (e.ctrlKey || e.metaKey) {
+      tr.classList.toggle('selected');
+      lastClickedRowIdx = rowIdx;
+    } else {
+      clearRowSelection();
+      tr.classList.add('selected');
+      lastClickedRowIdx = rowIdx;
+    }
+    return;
+  }
+
+  if (td.classList.contains('input-col')) {
+    e.preventDefault();
+    clearRowSelection();
+    if (td.classList.contains('cell-editing')) return;
+    else if (td.classList.contains('cell-selected')) enterEdit(td, false);
+    else selectCell(td);
+  }
+});
+
+document.addEventListener('dblclick', e => {
+  const td = e.target.closest('td');
+  if (td && td.classList.contains('input-col')) {
+    e.preventDefault();
+    clearRowSelection();
+    enterEdit(td, false);
+  }
+});
+
+// ── Input event for live recalc ──
+document.addEventListener('input', e => {
+  if (e.target.tagName !== 'INPUT') return;
+  const tr = e.target.closest('tr');
+  if (tr) triggerRowCompute(tr);
+});
+
+// ── Focus guard ──
+document.addEventListener('focus', e => {
+  if (e.target.tagName === 'INPUT' && e.target.type === 'number') {
+    const td = e.target.closest('td');
+    if (td && !td.classList.contains('cell-selected') && !td.classList.contains('cell-editing')) {
+      selectCell(td);
+    }
+  }
+}, true);
+
+// ══════════════════════════════════════════════════════
+//  KEYBOARD HANDLER (shared for both tabs)
+// ══════════════════════════════════════════════════════
+
+document.addEventListener('keydown', e => {
+  const ctx = getActiveCtx();
+  const tbody = getActiveTbody();
+
+  // Ctrl+D — fill down
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'd') {
+    const selected = getSelectedRows();
+    if (selected.length < 2) return;
+    e.preventDefault();
+    const sourceRow = selected[0];
+    const fields = ctx.getFields();
+    const activeTd = getSelectedCell();
+    const focusedField = activeTd ? activeTd.querySelector('input')?.dataset.field : null;
+    const fillFields = focusedField && fields.includes(focusedField) ? [focusedField] : fields;
+    for (let i = 1; i < selected.length; i++) {
+      const targetRow = selected[i];
+      for (const field of fillFields) {
+        targetRow.querySelector(`[data-field="${field}"]`).value =
+          sourceRow.querySelector(`[data-field="${field}"]`).value;
+      }
+      triggerRowCompute(targetRow);
+    }
+    ctx.ensureEmptyLastRow();
+    return;
+  }
+
+  // Shift+D — copy row above (select mode only)
+  if (e.shiftKey && !e.ctrlKey && !e.metaKey && e.key === 'D' && !editMode) {
+    const activeTd = getSelectedCell();
+    if (!activeTd) return;
+    const tr = activeTd.closest('tr');
+    const rowIdx = getRowIndex(tr);
+    if (rowIdx <= 0) return;
+    e.preventDefault();
+    const sourceRow = tbody.rows[rowIdx - 1];
+    for (const field of ctx.getFields()) {
+      tr.querySelector(`[data-field="${field}"]`).value =
+        sourceRow.querySelector(`[data-field="${field}"]`).value;
+    }
+    triggerRowCompute(tr);
+    ctx.ensureEmptyLastRow();
+    return;
+  }
+
+  const activeTd = getSelectedCell();
+  if (!activeTd) return;
+
+  const input = activeTd.querySelector('input');
+  const tr = activeTd.closest('tr');
+  const rowIdx = getRowIndex(tr);
+  const colIdx = Array.from(tr.cells).indexOf(activeTd);
+  const inputCols = getInputColIndices(tr);
+  const inputColPos = inputCols.indexOf(colIdx);
+
+  // ── SELECT MODE ──
+  if (!editMode) {
+    if (e.key === 'F2') { e.preventDefault(); enterEdit(activeTd, false); return; }
+
+    if (e.key === 'Delete' || e.key === 'Backspace') {
+      e.preventDefault();
+      input.value = '';
+      triggerRowCompute(tr);
+      return;
+    }
+
+    if (e.key === 'Escape') {
+      e.preventDefault(); clearCellSelection(); clearRowSelection();
+      document.activeElement.blur(); return;
+    }
+
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      if (!e.shiftKey) {
+        if (inputColPos < inputCols.length - 1) navigateTo(tbody, rowIdx, inputCols[inputColPos + 1]);
+        else if (rowIdx < tbody.rows.length - 1) navigateTo(tbody, rowIdx + 1, inputCols[0]);
+        else { ctx.ensureEmptyLastRow(); navigateTo(tbody, rowIdx + 1, inputCols[0]); }
+      } else {
+        if (inputColPos > 0) navigateTo(tbody, rowIdx, inputCols[inputColPos - 1]);
+        else if (rowIdx > 0) { const pi = getInputColIndices(tbody.rows[rowIdx - 1]); navigateTo(tbody, rowIdx - 1, pi[pi.length - 1]); }
+      }
+      return;
+    }
+
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (rowIdx < tbody.rows.length - 1) navigateTo(tbody, rowIdx + 1, colIdx);
+      else { ctx.ensureEmptyLastRow(); navigateTo(tbody, rowIdx + 1, colIdx); }
+      return;
+    }
+
+    if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) {
+      e.preventDefault();
+      if (e.shiftKey && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
+        if (selectionAnchorIdx === null) selectionAnchorIdx = rowIdx;
+        const nextIdx = e.key === 'ArrowUp' ? Math.max(0, rowIdx - 1) : Math.min(tbody.rows.length - 1, rowIdx + 1);
+        clearRowSelection();
+        const s = Math.min(selectionAnchorIdx, nextIdx), en = Math.max(selectionAnchorIdx, nextIdx);
+        for (let i = s; i <= en; i++) tbody.rows[i].classList.add('selected');
+        lastClickedRowIdx = nextIdx;
+        navigateTo(tbody, nextIdx, colIdx);
+        return;
+      }
+      selectionAnchorIdx = null; clearRowSelection();
+      if (e.key === 'ArrowUp' && rowIdx > 0) navigateTo(tbody, rowIdx - 1, colIdx);
+      else if (e.key === 'ArrowDown' && rowIdx < tbody.rows.length - 1) navigateTo(tbody, rowIdx + 1, colIdx);
+      else if (e.key === 'ArrowLeft' && inputColPos > 0) navigateTo(tbody, rowIdx, inputCols[inputColPos - 1]);
+      else if (e.key === 'ArrowRight' && inputColPos < inputCols.length - 1) navigateTo(tbody, rowIdx, inputCols[inputColPos + 1]);
+      return;
+    }
+
+    if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey && /[0-9.\-]/.test(e.key)) {
+      enterEdit(activeTd, true);
+      return;
+    }
+    return;
+  }
+
+  // ── EDIT MODE ──
+  if (e.key === 'Escape') { e.preventDefault(); exitEdit(); return; }
+
+  if (e.key === 'Enter') {
+    e.preventDefault(); exitEdit();
+    if (rowIdx < tbody.rows.length - 1) navigateTo(tbody, rowIdx + 1, colIdx);
+    else { ctx.ensureEmptyLastRow(); navigateTo(tbody, rowIdx + 1, colIdx); }
+    return;
+  }
+
+  if (e.key === 'Tab') {
+    e.preventDefault(); exitEdit();
+    if (!e.shiftKey) {
+      if (inputColPos < inputCols.length - 1) navigateTo(tbody, rowIdx, inputCols[inputColPos + 1]);
+      else if (rowIdx < tbody.rows.length - 1) navigateTo(tbody, rowIdx + 1, inputCols[0]);
+      else { ctx.ensureEmptyLastRow(); navigateTo(tbody, rowIdx + 1, inputCols[0]); }
+    } else {
+      if (inputColPos > 0) navigateTo(tbody, rowIdx, inputCols[inputColPos - 1]);
+      else if (rowIdx > 0) { const pi = getInputColIndices(tbody.rows[rowIdx - 1]); navigateTo(tbody, rowIdx - 1, pi[pi.length - 1]); }
+    }
+    return;
+  }
+});
+
+// ── Init ──
+flh.addRow(false);
+dist.addRow(false);
+</script>
+</body>
+</html>

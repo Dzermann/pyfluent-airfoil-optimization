@@ -334,7 +334,7 @@ Every column in `sim_data.xlsx` maps to a keyword argument of the matching funct
 | `time_step_count` | `100` | Number of transient time steps |
 | `iters_per_time_step` | `20` | Iterations per time step |
 | `final_iterations` | `300` | Iterations for the final post-adjoint solve (thesis: `iterations`) |
-| `infinite_mode` | `False` | Overrides `optimization_loop_count`; loops until mesh quality drops below threshold |
+| `infinite_mode` | `False` | Overrides `optimization_loop_count`; loops until mesh quality drops below `min_orth_quality_limit` |
 | `min_orth_quality_limit` | `0.06` | Minimum orthogonal quality for infinite-mode stop |
 | `maintain_len` | `True` | Keep airfoil chord length constant |
 | `adjoint_iterations` | `20` | Iterations of the adjoint solver per loop |

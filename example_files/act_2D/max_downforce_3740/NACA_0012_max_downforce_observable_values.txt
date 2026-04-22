@@ -1,0 +1,32 @@
+Observable: lift-to-drag
+---
+Iteration 1: 0.16076553
+Iteration 2: 0.68458509
+Iteration 3: -58.437801
+Iteration 4: -29.967707
+Iteration 5: -36.920338
+Iteration 6: -34.833202
+Iteration 7: -43.048443
+Iteration 8: -48.628864
+Iteration 9: -45.917538
+Iteration 10: -46.103268
+Iteration 11: -43.212605
+Iteration 12: -92.711037
+Iteration 13: -42.129463
+Iteration 14: -73.15419
+Iteration 15: -42.018829
+Iteration 16: -415.92654
+Iteration 17: -43.473328
+Iteration 18: -62.796303
+Iteration 19: -34.244793
+Iteration 20: -45.309238
+Iteration 21: -135.92365
+Iteration 22: -49.4259
+Iteration 23: -31.73815
+Iteration 24: -127.89075
+Iteration 25: -117.71168
+Iteration 26: -36.626854
+Iteration 27: -42.920334
+Iteration 28: -84.8293
+Iteration 29: -54.533588
+Iteration 30: -73.748268

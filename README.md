@@ -400,31 +400,52 @@ Documented honestly, in case you're considering building on this:
 ```
 .
 ├── src/
-│   ├── Main_File_Meshing.py       # Driver: iterate meshing_table, call mesh()
-│   ├── Main_File_Solution.py      # Driver: iterate solution_table, call solve()
-│   ├── Main_File_Optimization.py  # Driver: iterate adjoint_table, call optimize()
-│   ├── Meshing_Function.py        # mesh() — SpaceClaim → watertight mesh
-│   ├── Solution_Function.py       # solve() — mesh → converged flow solution
-│   ├── Adjoint_Function.py        # optimize() — case → optimised geometry
-│   └── dachis_tools.py            # shared utilities (IO, plotting, file moves) [written with AI assistance]
-├── supplementary_tools/                   # [all .html files in this folder are AI written]
-│   ├── airfoil_tools.html                 # browser tool: plot, scale, sort, and compare airfoil coordinates [AI written]
-│   ├── first_layer_height_calculator.html # browser tool: calculate first boundary-layer heights from target y⁺ [AI written]
-│   └── chart_studio.html                  # browser tool: make charts [AI written]
+│   ├── Main_File_Meshing.py                     # Driver: iterate meshing_table, call mesh()
+│   ├── Main_File_Solution.py                    # Driver: iterate solution_table, call solve()
+│   ├── Main_File_Optimization.py                # Driver: iterate adjoint_table, call optimize()
+│   ├── Meshing_Function.py                      # mesh() — SpaceClaim → watertight mesh
+│   ├── Solution_Function.py                     # solve() — mesh → converged flow solution
+│   ├── Adjoint_Function.py                      # optimize() — case → optimised geometry
+│   └── dachis_tools.py                          # shared utilities (IO, plotting, file moves) [written with AI assistance]
+├── supplementary_tools/                         # [all .html files in this folder are AI written]
+│   ├── airfoil_tools.html                       # browser tool: plot, scale, sort, and compare airfoil coordinates [AI written]
+│   ├── first_layer_height_calculator.html       # browser tool: calculate first boundary-layer heights from target y⁺ [AI written]
+│   └── chart_studio.html                        # browser tool: make charts [AI written]
 ├── experimental/
-│   └── response_analysis.py       # experimental Optuna sweep over meshing parameters (did not produce usable results)
-├── example_files/                 # sample inputs and reference outputs
-│   ├── NACA_0012.scdocx           # sample SpaceClaim geometry (3D)
-│   ├── NACA_0012_2D.scdocx        # sample SpaceClaim geometry (2D)
-│   ├── NACA_0012_final.msh.h5     # sample mesh output
-│   ├── NACA_0012_final_inputs.txt # sample meshing input record
-│   ├── NACA_0012_final_log.txt    # sample meshing log
-│   ├── act_3D/                    # sample full solver output (optimised case)
-│   └── ref_3D/                    # sample full solver output (reference case)
-├── sim_data.xlsx                  # input tables (three sheets)
-├── requirements.txt               # Python dependencies
-├── Aero-Opt_thesis.pdf            # full thesis PDF
-└── README.md                      # this file
+│   └── response_analysis.py                     # experimental Optuna sweep over meshing parameters (did not produce usable results)
+├── example_files/                               # sample inputs and reference outputs
+│   ├── NACA_0012.scdocx                         # sample SpaceClaim geometry (3D)
+│   ├── NACA_0012_2D.scdocx                      # sample SpaceClaim geometry (2D)
+│   ├── NACA_0012_final.msh.h5                   # sample mesh output
+│   ├── NACA_0012_final_inputs.txt               # sample meshing input record
+│   ├── NACA_0012_final_log.txt                  # sample meshing log
+│   ├── act_2D/                                  # sample output (2D, optimised airfoil) — root files are the solve; subfolders are optimisation runs
+│   │   ├── NACA_0012_2D_act_2D.cas.h5 / .dat.h5 # [solve] case and data files
+│   │   ├── C_{d,l}_*.out / *_steady.png         # [solve] drag/lift report files and convergence plots
+│   │   ├── *_mach_cont.png / *_pres_cont.png    # [solve] Mach and pressure contours
+│   │   ├── *_pres-plot.png / *_y-plus.png       # [solve] pressure distribution and y⁺ plots
+│   │   ├── *_residuals.png / *_mass_flow.flp    # [solve] residuals plot and mass-flow record
+│   │   ├── *_inputs.txt / *_log.txt             # [solve] input record and solver log
+│   │   ├── NACA_0012_2D.xy                      # [solve] airfoil coordinates
+│   │   ├── final_30_1241/                       # [optimisation run] finite-mode, 30 loops
+│   │   ├── final_30_long_4331/                  # [optimisation run] finite-mode, 30 loops, long
+│   │   ├── final_inf_5307/                      # [optimisation run] infinite-mode
+│   │   ├── final_inf_long_5615/                 # [optimisation run] infinite-mode, long
+│   │   └── max_downforce_3740/                  # [optimisation run] max-downforce target
+│   ├── act_3D/                                  # sample solve output (3D, optimised airfoil)
+│   │   ├── NACA_0012_act_3D.cas.h5 / .dat.h5    # case and data files
+│   │   ├── C_{d,l}_*.out / *_steady.png         # drag/lift reports and convergence plots
+│   │   ├── *_mach_cont.png / *_pres_cont.png    # Mach and pressure contours
+│   │   ├── *_pres-plot.png / *_y-plus.png       # pressure distribution and y⁺ plots
+│   │   ├── *_residuals.png / *_mass_flow.flp    # residuals plot and mass-flow record
+│   │   ├── *_inputs.txt / *_log.txt             # input record and solver log
+│   │   └── NACA_0012.xy                         # airfoil coordinates
+│   ├── ref_2D/                                  # sample solve output (2D, reference airfoil) — same structure as act_2D root
+│   └── ref_3D/                                  # sample solve output (3D, reference airfoil) — same structure as act_3D
+├── sim_data.xlsx                                # input tables (three sheets)
+├── requirements.txt                             # Python dependencies
+├── Aero-Opt_thesis.pdf                          # full thesis PDF
+└── README.md                                    # this file
 ```
 
 ---

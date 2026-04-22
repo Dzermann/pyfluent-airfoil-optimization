@@ -1,0 +1,15 @@
+Observable: lift-to-drag
+---
+Iteration 1: 27.35635
+Iteration 2: 27.792253
+Iteration 3: 28.196898
+Iteration 4: 28.573633
+Iteration 5: 28.977522
+Iteration 6: 29.429712
+Iteration 7: 29.89781
+Iteration 8: 30.399523
+Iteration 9: 30.968224
+Iteration 10: 31.636324
+Iteration 11: 32.319016
+Iteration 12: 33.071033
+Iteration 13: 33.888199

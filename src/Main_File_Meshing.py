@@ -5,7 +5,7 @@
     This is the file that uses all the functions created
     Reads the excel file, gets the values, then runs the mesh function for each
     row in the excel file, using the appropriate values.
-    Blank values in the file are removed, so default values are used in the function
+    Blank values in the file are removed, default values are used in the function
 
     The results will be written into a separate file - including time taken to mesh, C_d and quality
 
@@ -22,7 +22,7 @@ from dachis_tools import read_table, save_inputs
 from Meshing_Function import mesh
 
 # Define the table address
-file_loc = "./sim_data.xlsx"
+file_loc = "C:/Users/99556/Desktop/Python Files/sim_data.xlsx"
 sheet_name = "meshing_data"
 table_name = "meshing_table"
 
@@ -60,3 +60,32 @@ for count, row in enumerate(table.itertuples(index=False), start=1):
         # skip to next row
         print(f"FAIL: Row {count}/{total_rows} skipped. Error: {e}")
         print(traceback.format_exc())
+
+
+# # %%
+# # Results Analysis
+# # Defining the file paths. The function will go through all of these
+# path1 = "C:/Users/99556/Desktop/Meshing/NACA_2412"
+# path2 = "C:/Users/99556/Desktop/Meshing/BACXXX"
+# path3 = "C:/Users/99556/Desktop/Meshing/NASA_SC(2)_0714"
+# path4 = "C:/Users/99556/Desktop/Meshing/NACA_0012"
+
+# # Defining the phrases to look for to get results
+# phrase1 = "The final maximum surface skewness is  "
+# phrase2 = "he final minimum Orthogonal Quality is  "
+# phrase3 = "Total time taken in seconds: "
+# phrase4 = "Cell count: "
+
+# # Defining the column names for the results
+# col1 = "max_skew"
+# col2 = "min_orth"
+# col3 = "time_taken:"
+# col4 = "cell_count:"
+
+# # Running the function
+# find_and_publish_results(
+#     paths=[path1, path2, path3, path4],
+#     phrases=[phrase1, phrase2, phrase3, phrase4],
+#     file_types=['log.txt'],  # look only for files with log in the name
+#     columns=[col1, col2, col3, col4]
+# )

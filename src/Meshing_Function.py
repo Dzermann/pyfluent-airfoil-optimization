@@ -8,7 +8,7 @@ Created on Fri Oct 31 23:49:14 2025
     Works as a function on any airfoil, as long as the variables are specified
 
     Start Date:  16/10/2025
-    Finish Date:
+    Finish Date: 27/04/2026
     - Dachi Dzeria, C00290924
 """
 

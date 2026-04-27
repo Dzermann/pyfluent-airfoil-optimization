@@ -4,7 +4,7 @@
 
 Aero-Opt is a Python pipeline that automates meshing, solving, and adjoint-based shape optimisation of 2D/3D airfoils in Ansys Fluent. It was developed as the computational core of a BEng(Hons) thesis at South East Technological University Carlow, and is released here so that other researchers and students can replicate, extend, or adapt the workflow to their own aerodynamic-optimisation problems.
 
-> **Note on authorship.** Some of this README and all files in the `supplementary_tools` folder (all `.html` files) are AI written. Parts of `dachis_tools.py` was written with AI assistance. All other scripts, along with the thesis itself, were written manually by the author. This file is project documentation only, and the AI written code are supplementary materials to the main code. It is not part of the thesis submission, so AI involvement in its prose does not constitute plagiarism under the academic-integrity policy referenced in the thesis.
+> **Note on authorship.** Some of this README and all files in the `supplementary_tools` folder (all `.html` files) are AI written. Parts of `dachis_tools.py` were written with AI assistance. All other scripts, along with the thesis itself, were written manually by the author. This file is project documentation only, and the AI written code are supplementary materials to the main code. It is not part of the thesis submission, so AI involvement in its prose does not constitute plagiarism under the academic-integrity policy referenced in the thesis.
 
 ---
 

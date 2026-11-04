@@ -10,6 +10,7 @@ It saves the inputs and does nothing else.
 
 import os
 import traceback
+from datetime import timedelta
 from time import time
 
 import pandas as pd
@@ -38,7 +39,7 @@ start_time = time()  # start the overall timer
 # Remove trailing spaces
 table.columns = table.columns.str.strip()
 
-current_address = os.path.dirname(os.path.abspath(__file__))
+current_address = os.getcwd()  # Fluent writes the report files to the working directory
 
 # Turn it into usable data for solving
 for count, row in enumerate(table.itertuples(index=False), start=1):
@@ -85,6 +86,9 @@ for count, row in enumerate(table.itertuples(index=False), start=1):
         
         progress = f"PASS: Row {count}/{total_rows} completed — {minutes} minutes and {seconds:.3f} seconds elapsed"
         print(progress)
+        # estimate the remaining time from the average row time so far
+        estimated_time = elapsed / count * (total_rows - count)
+        print(f"Estimated time remaining: {timedelta(seconds=round(estimated_time))}")
 
     except Exception as e:
         # skip to next row

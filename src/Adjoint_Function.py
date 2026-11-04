@@ -63,6 +63,7 @@ def optimize(
     shut_down_when_done=True,  # shut down when done?
     generate_yplus=True,  # generate yplus plot or not
     generate_pres_plot=True,  # generate pres plot or not
+    generate_mach_cont=True,  # generate mach contours or not (not available with constant density)
 
     report_1_name='C_d',  # name of the drag report
     report_2_name='C_l',  # name of the lift report
@@ -444,14 +445,15 @@ def optimize(
         # %% Defining the contours
         graphics = Graphics(ssn)
 
-        graphics.contour['mach_cont'] = {
-            'field': 'mach-number',  # field
-            # "surfaces_list": [symmetry_1_name], # specify surfaces
-            'contour_lines': contour_lines,  # specify if contour lines should be on
-            'coloring': {
-                'option': smooth_or_banded  # specify smooth or banded coloring
+        if generate_mach_cont:
+            graphics.contour['mach_cont'] = {
+                'field': 'mach-number',  # field
+                # "surfaces_list": [symmetry_1_name], # specify surfaces
+                'contour_lines': contour_lines,  # specify if contour lines should be on
+                'coloring': {
+                    'option': smooth_or_banded  # specify smooth or banded coloring
+                }
             }
-        }
 
         graphics.contour['pres_cont'] = {  # define name
             'field': 'pressure',  # define the field
@@ -711,8 +713,9 @@ def optimize(
                     pres_name = f'pres_cont_{i:0{len(str(loop_count))}}.png'  # save pressure contours
                     save_pres(pres_path, pres_name)
 
-                    mach_name = f'mach_cont_{i:0{len(str(loop_count))}}.png'  # save mach countours
-                    save_mach(mach_path, mach_name)
+                    if generate_mach_cont:
+                        mach_name = f'mach_cont_{i:0{len(str(loop_count))}}.png'  # save mach countours
+                        save_mach(mach_path, mach_name)
 
                 if infinite_mode and current_orth_quality < min_orth_quality_limit:
 
@@ -931,7 +934,8 @@ def optimize(
 
             # run the make_gif function
             make_gif(mesh_gif_path, mesh_path, gif_duration)
-            make_gif(mach_gif_path, mach_path, gif_duration)
+            if generate_mach_cont:
+                make_gif(mach_gif_path, mach_path, gif_duration)
             make_gif(pres_gif_path, pres_path, gif_duration)
 
 

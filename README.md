@@ -357,6 +357,7 @@ Every column in `sim_data.xlsx` maps to a keyword argument of the matching funct
 | `shut_down_when_done` | `True` | Close Fluent when optimisation finishes |
 | `generate_yplus` | `True` | Generate y⁺ plot |
 | `generate_pres_plot` | `True` | Generate pressure-distribution plot |
+| `generate_mach_cont` | `True` | Save Mach-number contours each loop. Set `False` for `constant_density` cases, which have no Mach number |
 | `report_1_name` | `'C_d'` | Drag report name |
 | `report_2_name` | `'C_l'` | Lift report name |
 | `report_plot` | `True` | Plot drag/lift results |

@@ -258,6 +258,7 @@ Every column in `sim_data.xlsx` maps to a keyword argument of the matching funct
 | `report_1_name` | `'C_d'` | Drag coefficient report name |
 | `report_2_name` | `'C_l'` | Lift coefficient report name |
 | `operating_pres` | `0` | Operating gauge pressure, in Pascals |
+| `gauge_pres` | `None` | Far-field gauge pressure, in Pascals. Defaults to the static pressure at `altitude` minus `operating_pres`. Fluent recommends `operating_pres` ≈ the mean flow pressure (e.g. 101325) below Mach 0.1 |
 | `solver_type` | `'pressure-based'` | Solver algorithm |
 | `visc_method` | `'sutherland'` | Viscosity calculation method |
 | `visc_model` | `'spalart-allmaras'` | Turbulence model |

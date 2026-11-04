@@ -42,6 +42,7 @@ def solve(file_path,  # specify the mesh location
           report_1_name='C_d',  # name of the first solution report
           report_2_name='C_l',  # name of the second solution report
           operating_pres=0,  # operating pressure, default is 0
+          gauge_pres=None,  # far-field gauge pressure, Pa. Defaults to the static pressure at altitude minus operating_pres
           solver_type='pressure-based',  # pressure vs density based solver
           visc_method='sutherland',
           visc_model='spalart-allmaras',  # viscous mode
@@ -167,6 +168,8 @@ def solve(file_path,  # specify the mesh location
         kinematic_visc = dynamic_visc / density  # kinematic viscosity, m^2/s
         RE = (chord_len * velocity) / kinematic_visc  # reynolds number
         pressure = p_0 * ((T_0) / (T_0 - alpha * h)) ** ((g * mol_mass) / (R_uni * -alpha))
+        if gauge_pres is None:  # Fluent takes pressures relative to the operating pressure
+            gauge_pres = pressure - operating_pres
         # d_T = temperature - sea_level_temp # change in temperature, K
 
         print("PASS: Reference values calculated...")
@@ -272,7 +275,7 @@ def solve(file_path,  # specify the mesh location
             # specifying the boundary components
             setup.boundary_conditions.pressure_far_field['farfield'] = {
                 'momentum': {
-                    'gauge_pressure': pressure,  # gauge pressure
+                    'gauge_pressure': gauge_pres,  # gauge pressure
                     'mach_number': mach_num,  # mach number
                     'flow_direction': [x_mach, y_mach]  # x and y components of flow
                 },
@@ -295,7 +298,7 @@ def solve(file_path,  # specify the mesh location
             # specifying the boundary components
             setup.boundary_conditions.pressure_far_field['farfield'] = {
                 'momentum': {
-                    'gauge_pressure': pressure,  # gauge pressure
+                    'gauge_pressure': gauge_pres,  # gauge pressure
                     'mach_number': mach_num,  # mach number
                     'flow_direction': [x_mach, y_mach]  # x and y components of flow
                 },
@@ -310,7 +313,7 @@ def solve(file_path,  # specify the mesh location
             }
 
         print("PASS: Boundary conditions specified...")
-        print(f"Pressure [Pa] set to {pressure}...")
+        print(f"Gauge pressure [Pa] set to {gauge_pres} (operating pressure {operating_pres})...")
         print(f"Mach Number [M] set to {mach_num}...")
         print(f"Temperature [K] set to {temperature}...")
 
@@ -408,7 +411,7 @@ def solve(file_path,  # specify the mesh location
             'area': area,
             'density': density,
             'length': chord_len,
-            'pressure': pressure,
+            'pressure': gauge_pres,
             'temperature': temperature,
             'velocity': velocity,
             'viscosity': dynamic_visc,
@@ -474,7 +477,7 @@ def solve(file_path,  # specify the mesh location
             solution.initialization.compute_defaults(from_zone_name=farfield_name)
             solution.initialization = {
                 'defaults': {
-                    'pressure': pressure,
+                    'pressure': gauge_pres,
                     'temperature': temperature,
                     'x-velocity': x_vel,
                     'y-velocity': y_vel

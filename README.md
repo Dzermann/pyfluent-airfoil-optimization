@@ -265,6 +265,7 @@ Every column in `sim_data.xlsx` maps to a keyword argument of the matching funct
 | `k_omega_model` | `'geko'` | Sub-model if k-ω is selected |
 | `curvature_correction` | `False` | Apply curvature correction |
 | `compressibility_effects` | `False` | Apply compressibility effects |
+| `constant_density` | `None` | Constant air density, kg/m³. Leave empty for ideal gas with a pressure far-field (the default). Set it (e.g. `1.225`) for low-Mach runs: density and viscosity become constant, energy is turned off, and the far-field becomes a velocity inlet. Set `generate_mach_cont` to `False` with it |
 | `farfield_name` | `'farfield'` | Farfield boundary label |
 | `upper_name` | `'upper'` | Upper surface label |
 | `lower_name` | `'lower'` | Lower surface label |

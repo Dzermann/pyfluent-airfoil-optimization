@@ -60,6 +60,8 @@ Projected to the active Boeing 747-400 and Cessna 172 fleets, these aerodynamic 
 
 Earlier Ansys versions (2023 R2+) should work but are untested. PyFluent API changes between versions — pin the version specified above for guaranteed compatibility.
 
+> **Ansys 2026 R1.** The meshing code now targets Ansys 2026 R1 (tested on Ansys Student 2026 R1 with PyFluent 0.42.2). Fluent 2026 R1 renamed several watertight-meshing tasks — `add_local_sizing` → `add_local_sizing_wtm`, `add_boundary_layer` → `add_boundary_layers`, `create_volume_mesh` → `create_volume_mesh_wtm` — so `src/Meshing_Function.py` no longer runs on 2025 R2. To run on 2025 R2, check out commit `c7ca25d` (the version used for the thesis).
+
 ### Python dependencies
 
 ```bash
@@ -69,12 +71,14 @@ pip install -r requirements.txt
 `requirements.txt` covers:
 
 ```
-ansys-fluent-core==0.37.1
+ansys-fluent-core
 pandas
-matplotlib
-openpyxl
 numpy
+matplotlib
+scipy
+imageio
 Pillow
+openpyxl
 ```
 
 ### Ansys licence
@@ -117,6 +121,8 @@ Open `sim_data.xlsx`. Three sheets drive the three scripts:
 | `adjoint_data` | `adjoint_table` | `Main_File_Optimization.py` |
 
 Each row = one simulation. Leave any cell blank to use the function default (see [Default values](#default-values) below for the full listing).
+
+> **Use absolute paths in `file_path`** (e.g. `C:\...\example_files\NACA_0012.scdocx`). The output folder is created next to that file and its path is handed to Fluent, which can't write into relative paths such as `.\example_files\...` — the mesh write silently hangs.
 
 Minimum required columns for each stage:
 

@@ -157,7 +157,7 @@ def mesh(file_path,  # specify the file path
             # Adding Local Sizing to upper/lower
             print("Adding local sizing to upper/lower...")
             if Boi_1:
-                ls = wt.add_local_sizing  # add local sizing
+                ls = wt.add_local_sizing_wtm  # add local sizing
                 ls.add_child = "yes"  # add local sizing as child
                 ls.boi_execution = Boi_1_Execution  # specify type
                 ls.boi_face_label_list = [lower_name, upper_name]  # specify the list of faces
@@ -176,7 +176,7 @@ def mesh(file_path,  # specify the file path
             if has_te:
                 print("Adding local sizing to te...")
 
-                ls = wt.add_local_sizing  # same as above
+                ls = wt.add_local_sizing_wtm  # same as above
                 ls.add_child = "yes"
                 ls.boi_execution = Boi_2_Execution
                 ls.boi_scope_to = Boi_2_Scope_To  # scope to
@@ -231,28 +231,28 @@ def mesh(file_path,  # specify the file path
             ub = wt.update_boundaries  # updating boundaries
 
             # get the list of names and rename them
-            ub.boundary_label_list.set_state(
+            ub.boundary_label_list = (
                 [farfield_name,
                  symmetry_1_name,
                  symmetry_2_name,
                  upper_name,
                  lower_name]
             )
-            ub.boundary_label_type_list.set_state(
+            ub.boundary_label_type_list = (
                 ["pressure-far-field",
                  "symmetry",
                  "symmetry",
                  "wall",
                  "wall"]
             )
-            ub.old_boundary_label_list.set_state(
+            ub.old_boundary_label_list = (
                 [farfield_name,
                  symmetry_1_name,
                  symmetry_2_name,
                  upper_name,
                  lower_name]
             )
-            ub.old_boundary_label_type_list.set_state(
+            ub.old_boundary_label_type_list = (
                 ["pressure-far-field",
                  "symmetry",
                  "symmetry",
@@ -289,10 +289,10 @@ def mesh(file_path,  # specify the file path
             # Adding boundary layers
             print("Adding boundary layers...")
 
-            bl = wt.add_boundary_layer  # add boundary layers
+            bl = wt.add_boundary_layers  # add boundary layers
             bl.first_height = Bl_First_Height  # specify the first height
             bl.offset_method_type = Bl_Control_Name  # specify bl method
-            bl.bl_control_name = Bl_Control_Name  # specify the name
+            bl.control_name = Bl_Control_Name  # specify the name
             bl.number_of_layers = Bl_Number_Of_Layers  # specify number of layer
             if Bl_Control_Name != "last-ratio":  # other than last raito, all others have growth rate
                 bl.rate = Bl_Rate  # specify growth rate
@@ -306,16 +306,11 @@ def mesh(file_path,  # specify the file path
             # Generating the volume mesh
             print("Generating the volume mesh...")
 
-            vm = wt.create_volume_mesh
+            vm = wt.create_volume_mesh_wtm
 
-            vm.Arguments.set_state(  # using the old method because the new one couldn't work
-                {
-                 "VolumeFill": Volume_Fill_Type,
-                 "VolumeFillControls": {
-                    "TetPolyMaxCellLength": Volume_Fill_Size,
-                    "GrowthRate": Volume_Fill_Rate
-                    }
-                 })
+            vm.volume_fill = Volume_Fill_Type  # specify volume fill type
+            vm.volume_fill_controls.tet_poly_max_cell_length = Volume_Fill_Size  # specify max cell size
+            vm.volume_fill_controls.growth_rate = Volume_Fill_Rate  # specify growth rate
 
             vm()
             print("PASS: Volume mesh generated")
@@ -436,7 +431,7 @@ def mesh(file_path,  # specify the file path
             bl = two_d.add_2d_boundary_layers  # add boundary layers
             bl.add_child = 'yes'
             bl.offset_method_type = Bl_Control_Name  # specify bl method
-            bl.bl_control_name = Bl_Control_Name  # specify the name
+            bl.control_name = Bl_Control_Name  # specify the name
             bl.first_layer_height = Bl_First_Height  # specify the first height
             bl.number_of_layers = Bl_Number_Of_Layers  # specify number of layer
             if Bl_Control_Name != "last-ratio":  # other than last raito, all others have growth rate

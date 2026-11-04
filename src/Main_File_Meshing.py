@@ -22,7 +22,7 @@ from dachis_tools import read_table, save_inputs
 from Meshing_Function import mesh
 
 # Define the table address
-file_loc = "C:/Users/99556/Desktop/Python Files/sim_data.xlsx"
+file_loc = "./sim_data.xlsx"
 sheet_name = "meshing_data"
 table_name = "meshing_table"
 

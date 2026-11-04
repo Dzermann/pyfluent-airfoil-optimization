@@ -43,7 +43,7 @@ start_time = time()  # start the overall timer
 # Remove trailing spaces
 table.columns = table.columns.str.strip()
 
-current_address = os.path.dirname(os.path.abspath(__file__))
+current_address = os.getcwd()  # Fluent writes the report files to the working directory
 
 # Turn it into usable data for solving
 for count, row in enumerate(table.itertuples(index=False), start=1):

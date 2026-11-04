@@ -243,26 +243,25 @@ def optimize(
 
         # %% Setting up the observables
         print("PASS: Adjoint solver active. Defining observables...")
+        # Fluent 2026 R1 groups the observables by type under 'definitions'
         ssn.settings.design.gradient_based.observables = {
             'named_expressions': {},
-            'definition': {
-                'drag': {
-                    'name': 'drag',  # define the drag observable
-                    'type': 'force',
-                    'walls': [upper_name, lower_name],  # select the zones
-                    'vector': [x_mach, y_mach, 0.0]  # vectors is based on aoa
+            'definitions': {
+                'force': {
+                    'drag': {  # define the drag observable
+                        'walls': [upper_name, lower_name],  # select the zones
+                        'vector': [x_mach, y_mach, 0.0]  # vectors is based on aoa
+                    },
+                    'lift': {  # define the lift observable
+                        'walls': [upper_name, lower_name],
+                        'vector': [-y_mach, x_mach, 0.0]
+                    }
                 },
-                'lift': {
-                    'name': 'lift',  # define the lift observable
-                    'type': 'force',
-                    'walls': [upper_name, lower_name],
-                    'vector': [-y_mach, x_mach, 0.0]
-                },
-                'lift-to-drag': {
-                    'name': 'lift-to-drag',  # define the lift-to-drag ratio
-                    'type': 'ratio',
-                    'numerator': 'lift',
-                    'denominator': 'drag'
+                'ratio': {
+                    'lift-to-drag': {  # define the lift-to-drag ratio
+                        'numerator': 'lift',
+                        'denominator': 'drag'
+                    }
                 }
             },
         }

@@ -157,7 +157,7 @@ def mesh(file_path,  # specify the file path
             # Adding Local Sizing to upper/lower
             print("Adding local sizing to upper/lower...")
             if Boi_1:
-                ls = wt.add_local_sizing  # add local sizing
+                ls = wt.add_local_sizing_wtm  # add local sizing
                 ls.add_child = "yes"  # add local sizing as child
                 ls.boi_execution = Boi_1_Execution  # specify type
                 ls.boi_face_label_list = [lower_name, upper_name]  # specify the list of faces
@@ -176,7 +176,7 @@ def mesh(file_path,  # specify the file path
             if has_te:
                 print("Adding local sizing to te...")
 
-                ls = wt.add_local_sizing  # same as above
+                ls = wt.add_local_sizing_wtm  # same as above
                 ls.add_child = "yes"
                 ls.boi_execution = Boi_2_Execution
                 ls.boi_scope_to = Boi_2_Scope_To  # scope to
@@ -231,28 +231,28 @@ def mesh(file_path,  # specify the file path
             ub = wt.update_boundaries  # updating boundaries
 
             # get the list of names and rename them
-            ub.boundary_label_list.set_state(
+            ub.boundary_label_list = (
                 [farfield_name,
                  symmetry_1_name,
                  symmetry_2_name,
                  upper_name,
                  lower_name]
             )
-            ub.boundary_label_type_list.set_state(
+            ub.boundary_label_type_list = (
                 ["pressure-far-field",
                  "symmetry",
                  "symmetry",
                  "wall",
                  "wall"]
             )
-            ub.old_boundary_label_list.set_state(
+            ub.old_boundary_label_list = (
                 [farfield_name,
                  symmetry_1_name,
                  symmetry_2_name,
                  upper_name,
                  lower_name]
             )
-            ub.old_boundary_label_type_list.set_state(
+            ub.old_boundary_label_type_list = (
                 ["pressure-far-field",
                  "symmetry",
                  "symmetry",
@@ -289,10 +289,10 @@ def mesh(file_path,  # specify the file path
             # Adding boundary layers
             print("Adding boundary layers...")
 
-            bl = wt.add_boundary_layer  # add boundary layers
+            bl = wt.add_boundary_layers  # add boundary layers
             bl.first_height = Bl_First_Height  # specify the first height
             bl.offset_method_type = Bl_Control_Name  # specify bl method
-            bl.bl_control_name = Bl_Control_Name  # specify the name
+            bl.control_name = Bl_Control_Name  # specify the name
             bl.number_of_layers = Bl_Number_Of_Layers  # specify number of layer
             if Bl_Control_Name != "last-ratio":  # other than last raito, all others have growth rate
                 bl.rate = Bl_Rate  # specify growth rate
@@ -306,16 +306,11 @@ def mesh(file_path,  # specify the file path
             # Generating the volume mesh
             print("Generating the volume mesh...")
 
-            vm = wt.create_volume_mesh
+            vm = wt.create_volume_mesh_wtm
 
-            vm.Arguments.set_state(  # using the old method because the new one couldn't work
-                {
-                 "VolumeFill": Volume_Fill_Type,
-                 "VolumeFillControls": {
-                    "TetPolyMaxCellLength": Volume_Fill_Size,
-                    "GrowthRate": Volume_Fill_Rate
-                    }
-                 })
+            vm.volume_fill = Volume_Fill_Type  # specify volume fill type
+            vm.volume_fill_controls.tet_poly_max_cell_length = Volume_Fill_Size  # specify max cell size
+            vm.volume_fill_controls.growth_rate = Volume_Fill_Rate  # specify growth rate
 
             vm()
             print("PASS: Volume mesh generated")
@@ -341,9 +336,10 @@ def mesh(file_path,  # specify the file path
             print("Importing geometry...")
             # Create watertight geometry
             two_d = ssn.two_dimensional_meshing()
-            two_d.load_cad_geometry_2d.file_name.set_state(new_file_path)  # import the file
-            two_d.load_cad_geometry_2d.length_unit.set_state(Units)  # set units
-            two_d.load_cad_geometry_2d()  # run import
+            lg = two_d.load_cad_geometry
+            lg.file_name = new_file_path  # import the file
+            lg.length_unit = Units  # set units
+            lg()  # run import
 
             print("PASS: Geometry imported")
 
@@ -353,7 +349,7 @@ def mesh(file_path,  # specify the file path
             # This should ideally rename the region to fluid, but I don't know how to do that
             print("Updating regions...")
 
-            ur = two_d.update_regions_2d  # update regions
+            ur = two_d.update_regions  # update regions
             ur()
 
             print("PASS: Regions updated")
@@ -363,7 +359,7 @@ def mesh(file_path,  # specify the file path
             # Updating boundaries
             print("Updating boundaries...")
 
-            ub = two_d.update_boundaries_2d  # updating boundaries
+            ub = two_d.update_boundaries  # updating boundaries
             ub()
 
             print("PASS: Boundaries updated")
@@ -373,9 +369,9 @@ def mesh(file_path,  # specify the file path
             # Defining global sizing
             print("Updating Global Sizing")
 
-            gs = two_d.define_global_sizing_2d
+            gs = two_d.define_global_sizing
             gs.size_functions = Surface_Size_Function  # specify size function
-            gs.grotwo_dh_rate = Surface_Rate  # specify grotwo_dh rate
+            gs.growth_rate = Surface_Rate  # specify growth rate
             gs.max_size = Surface_Max_Size  # specify max and min size
             gs.min_size = Surface_Min_Size
             gs.curvature_normal_angle = Surface_Curvature_Normal_Angle  # specify normal angle
@@ -393,7 +389,7 @@ def mesh(file_path,  # specify the file path
                 if Boi_1_Execution == "Face Size":
                     Boi_1_Execution = "Edge Size"
 
-                ls = two_d.add_local_sizing_2d  # add local sizing
+                ls = two_d.add_local_sizing_wtm  # add local sizing
                 ls.add_child = "yes"  # add local sizing as child
                 ls.edge_label_list = [lower_name, upper_name]  # specify the list of faces
                 ls.boi_execution = Boi_1_Execution  # specify type
@@ -415,7 +411,7 @@ def mesh(file_path,  # specify the file path
                 if Boi_2_Execution == "Face Size":
                     Boi_2_Execution = "Edge Size"
 
-                ls = two_d.add_local_sizing_2d  # same as above
+                ls = two_d.add_local_sizing_wtm  # same as above
                 ls.add_child = "yes"
                 ls.boi_execution = Boi_2_Execution
                 ls.boi_scope_to = Boi_2_Scope_To  # scope to
@@ -436,7 +432,7 @@ def mesh(file_path,  # specify the file path
             bl = two_d.add_2d_boundary_layers  # add boundary layers
             bl.add_child = 'yes'
             bl.offset_method_type = Bl_Control_Name  # specify bl method
-            bl.bl_control_name = Bl_Control_Name  # specify the name
+            bl.control_name = Bl_Control_Name  # specify the name
             bl.first_layer_height = Bl_First_Height  # specify the first height
             bl.number_of_layers = Bl_Number_Of_Layers  # specify number of layer
             if Bl_Control_Name != "last-ratio":  # other than last raito, all others have growth rate
@@ -459,9 +455,9 @@ def mesh(file_path,  # specify the file path
 
             # %%
             # Writing the mesh
-            two_d.write_2d_mesh(  # writing the mesh
-                FileName=location
-            )
+            wm = two_d.write_2d_mesh  # writing the mesh
+            wm.file_name = location
+            wm()
             print("PASS: Mesh Saved")
 
 

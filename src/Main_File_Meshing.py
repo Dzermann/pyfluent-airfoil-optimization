@@ -14,6 +14,7 @@
 """
 
 import traceback
+from datetime import timedelta
 from time import time
 
 import pandas as pd
@@ -22,7 +23,7 @@ from dachis_tools import read_table, save_inputs
 from Meshing_Function import mesh
 
 # Define the table address
-file_loc = "C:/Users/99556/Desktop/Python Files/sim_data.xlsx"
+file_loc = "./sim_data.xlsx"
 sheet_name = "meshing_data"
 table_name = "meshing_table"
 
@@ -55,6 +56,9 @@ for count, row in enumerate(table.itertuples(index=False), start=1):
 
         progress = f"PASS: Row {count}/{total_rows} completed — {minutes} minutes and {seconds:.3f} seconds elapsed"
         print(progress)
+        # estimate the remaining time from the average row time so far
+        estimated_time = elapsed / count * (total_rows - count)
+        print(f"Estimated time remaining: {timedelta(seconds=round(estimated_time))}")
 
     except Exception as e:
         # skip to next row

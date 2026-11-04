@@ -60,6 +60,8 @@ Projected to the active Boeing 747-400 and Cessna 172 fleets, these aerodynamic 
 
 Earlier Ansys versions (2023 R2+) should work but are untested. PyFluent API changes between versions — pin the version specified above for guaranteed compatibility.
 
+> **Ansys 2026 R1.** The meshing code now targets Ansys 2026 R1 (tested on Ansys Student 2026 R1 with PyFluent 0.42.2). Fluent 2026 R1 renamed several watertight-meshing tasks — `add_local_sizing` → `add_local_sizing_wtm`, `add_boundary_layer` → `add_boundary_layers`, `create_volume_mesh` → `create_volume_mesh_wtm` — so `src/Meshing_Function.py` no longer runs on 2025 R2. To run on 2025 R2, check out commit `c7ca25d` (the version used for the thesis).
+
 ### Python dependencies
 
 ```bash
@@ -69,12 +71,14 @@ pip install -r requirements.txt
 `requirements.txt` covers:
 
 ```
-ansys-fluent-core==0.37.1
+ansys-fluent-core
 pandas
-matplotlib
-openpyxl
 numpy
+matplotlib
+scipy
+imageio
 Pillow
+openpyxl
 ```
 
 ### Ansys licence
@@ -117,6 +121,8 @@ Open `sim_data.xlsx`. Three sheets drive the three scripts:
 | `adjoint_data` | `adjoint_table` | `Main_File_Optimization.py` |
 
 Each row = one simulation. Leave any cell blank to use the function default (see [Default values](#default-values) below for the full listing).
+
+> **Use absolute paths in `file_path`** (e.g. `C:\...\example_files\NACA_0012.scdocx`). The output folder is created next to that file and its path is handed to Fluent, which can't write into relative paths such as `.\example_files\...` — the mesh write silently hangs.
 
 Minimum required columns for each stage:
 
@@ -252,12 +258,14 @@ Every column in `sim_data.xlsx` maps to a keyword argument of the matching funct
 | `report_1_name` | `'C_d'` | Drag coefficient report name |
 | `report_2_name` | `'C_l'` | Lift coefficient report name |
 | `operating_pres` | `0` | Operating gauge pressure, in Pascals |
+| `gauge_pres` | `None` | Far-field gauge pressure, in Pascals. Defaults to the static pressure at `altitude` minus `operating_pres`. Fluent recommends `operating_pres` ≈ the mean flow pressure (e.g. 101325) below Mach 0.1 |
 | `solver_type` | `'pressure-based'` | Solver algorithm |
 | `visc_method` | `'sutherland'` | Viscosity calculation method |
 | `visc_model` | `'spalart-allmaras'` | Turbulence model |
 | `k_omega_model` | `'geko'` | Sub-model if k-ω is selected |
 | `curvature_correction` | `False` | Apply curvature correction |
 | `compressibility_effects` | `False` | Apply compressibility effects |
+| `constant_density` | `None` | Constant air density, kg/m³. Leave empty for ideal gas with a pressure far-field (the default). Set it (e.g. `1.225`) for low-Mach runs: density and viscosity become constant, energy is turned off, and the far-field becomes a velocity inlet. Set `generate_mach_cont` to `False` with it |
 | `farfield_name` | `'farfield'` | Farfield boundary label |
 | `upper_name` | `'upper'` | Upper surface label |
 | `lower_name` | `'lower'` | Lower surface label |
@@ -349,6 +357,7 @@ Every column in `sim_data.xlsx` maps to a keyword argument of the matching funct
 | `shut_down_when_done` | `True` | Close Fluent when optimisation finishes |
 | `generate_yplus` | `True` | Generate y⁺ plot |
 | `generate_pres_plot` | `True` | Generate pressure-distribution plot |
+| `generate_mach_cont` | `True` | Save Mach-number contours each loop. Set `False` for `constant_density` cases, which have no Mach number |
 | `report_1_name` | `'C_d'` | Drag report name |
 | `report_2_name` | `'C_l'` | Lift report name |
 | `report_plot` | `True` | Plot drag/lift results |

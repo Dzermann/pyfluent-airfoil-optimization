@@ -42,12 +42,14 @@ def solve(file_path,  # specify the mesh location
           report_1_name='C_d',  # name of the first solution report
           report_2_name='C_l',  # name of the second solution report
           operating_pres=0,  # operating pressure, default is 0
+          gauge_pres=None,  # far-field gauge pressure, Pa. Defaults to the static pressure at altitude minus operating_pres
           solver_type='pressure-based',  # pressure vs density based solver
           visc_method='sutherland',
           visc_model='spalart-allmaras',  # viscous mode
           k_omega_model='geko',  # default k-omega model (if k-omega is being used)
           curvature_correction=False,  # use curvature correction?
           compressibility_effects=False,  # use compressibility effects (not recommended by ansys)
+          constant_density=None,  # constant air density, kg/m^3. Leave empty for ideal gas; set it for low-Mach (incompressible) runs
           farfield_name='farfield',  # name of farfield
           upper_name='upper',  # name of upper surface
           lower_name='lower',  # name of lower surface
@@ -167,6 +169,8 @@ def solve(file_path,  # specify the mesh location
         kinematic_visc = dynamic_visc / density  # kinematic viscosity, m^2/s
         RE = (chord_len * velocity) / kinematic_visc  # reynolds number
         pressure = p_0 * ((T_0) / (T_0 - alpha * h)) ** ((g * mol_mass) / (R_uni * -alpha))
+        if gauge_pres is None:  # Fluent takes pressures relative to the operating pressure
+            gauge_pres = pressure - operating_pres
         # d_T = temperature - sea_level_temp # change in temperature, K
 
         print("PASS: Reference values calculated...")
@@ -244,14 +248,21 @@ def solve(file_path,  # specify the mesh location
                 'two_dim_space': two_d_space
             }
 
-        setup.materials.fluid["air"] = {  # define ideal gas law and sutherland viscousity
-            "density": {"option": "ideal-gas"},
-            "viscosity": {"option": "sutherland"},
-            # "specific_heat": {"option": "piecewise-polynomial"}
-        }
+        if constant_density is None:
+            setup.materials.fluid["air"] = {  # define ideal gas law and sutherland viscousity
+                "density": {"option": "ideal-gas"},
+                "viscosity": {"option": "sutherland"},
+                # "specific_heat": {"option": "piecewise-polynomial"}
+            }
+        else:  # incompressible: both properties are constant, so the energy equation isn't needed
+            setup.materials.fluid["air"] = {
+                "density": {"option": "constant", "value": constant_density},
+                "viscosity": {"option": "constant", "value": dynamic_visc},
+            }
 
-        setup.models.energy(enabled=True)  # enabling energy
-        print("PASS: Enabled energy...")
+        energy = constant_density is None  # ideal gas needs the energy equation
+        setup.models.energy(enabled=energy)  # enabling energy
+        print(f"PASS: Energy equation enabled: {energy}...")
 
         # set operating pressure
         setup.general.operating_conditions(operating_pressure=operating_pres)
@@ -268,11 +279,36 @@ def solve(file_path,  # specify the mesh location
 
         # %% Setting up boundary conditions
         # specifying the boundary components
-        if visc_model == 'k-omega':
+        if constant_density is not None:  # pressure far-field needs ideal gas, so the far-field becomes a velocity inlet
+            if visc_model == 'k-omega':
+                turbulence = {
+                    'turbulence_specification': specification_method,
+                    'turbulent_intensity': turb_int / 100,  # convert to %
+                    'turbulent_viscosity_ratio': turb_visc_ratio
+                }
+                setup.models.viscous.options.curvature_correction = curvature_correction
+            else:
+                turbulence = {
+                    'turbulent_viscosity_ratio_profile': {
+                        'option': 'value', 'value': turb_visc_ratio
+                    }
+                }
+
+            setup.boundary_conditions.set_zone_type(zone_list=[farfield_name], new_type='velocity-inlet')
+            setup.boundary_conditions.velocity_inlet[farfield_name] = {
+                'momentum': {
+                    'velocity_specification_method': 'Magnitude and Direction',
+                    'velocity_magnitude': {'value': velocity},  # free-stream velocity
+                    'flow_direction': [x_mach, y_mach]  # x and y components of flow
+                },
+                'turbulence': turbulence
+            }
+
+        elif visc_model == 'k-omega':
             # specifying the boundary components
             setup.boundary_conditions.pressure_far_field['farfield'] = {
                 'momentum': {
-                    'gauge_pressure': pressure,  # gauge pressure
+                    'gauge_pressure': gauge_pres,  # gauge pressure
                     'mach_number': mach_num,  # mach number
                     'flow_direction': [x_mach, y_mach]  # x and y components of flow
                 },
@@ -295,7 +331,7 @@ def solve(file_path,  # specify the mesh location
             # specifying the boundary components
             setup.boundary_conditions.pressure_far_field['farfield'] = {
                 'momentum': {
-                    'gauge_pressure': pressure,  # gauge pressure
+                    'gauge_pressure': gauge_pres,  # gauge pressure
                     'mach_number': mach_num,  # mach number
                     'flow_direction': [x_mach, y_mach]  # x and y components of flow
                 },
@@ -310,7 +346,7 @@ def solve(file_path,  # specify the mesh location
             }
 
         print("PASS: Boundary conditions specified...")
-        print(f"Pressure [Pa] set to {pressure}...")
+        print(f"Gauge pressure [Pa] set to {gauge_pres} (operating pressure {operating_pres})...")
         print(f"Mach Number [M] set to {mach_num}...")
         print(f"Temperature [K] set to {temperature}...")
 
@@ -331,18 +367,22 @@ def solve(file_path,  # specify the mesh location
         solution.methods.high_order_term_relaxation.enable = True
         solution.methods.high_order_term_relaxation.relaxation_factor = relaxation_factor
 
+        discretization_scheme = {
+            'density': density_scheme,
+            'k': turb_kin_e_scheme,
+            'mom': mom_scheme,
+            'omega': spec_diss_rate_scheme,
+            'pressure': pres_scheme,
+            'temperature': energy_scheme
+        }
+        if constant_density is not None:  # no density or energy equations to discretize
+            del discretization_scheme['density'], discretization_scheme['temperature']
+
         # Specify the solution methods
         solution.methods = {
             'spatial_discretization': {
                 'gradient_scheme': gradient_scheme,
-                'discretization_scheme': {
-                    'density': density_scheme,
-                    'k': turb_kin_e_scheme,
-                    'mom': mom_scheme,
-                    'omega': spec_diss_rate_scheme,
-                    'pressure': pres_scheme,
-                    'temperature': energy_scheme
-                }
+                'discretization_scheme': discretization_scheme
             },
             'pseudo_time_method': {
                 'formulation': {'density_based_solver': pseudo_time_method}
@@ -408,7 +448,7 @@ def solve(file_path,  # specify the mesh location
             'area': area,
             'density': density,
             'length': chord_len,
-            'pressure': pressure,
+            'pressure': gauge_pres,
             'temperature': temperature,
             'velocity': velocity,
             'viscosity': dynamic_visc,
@@ -474,7 +514,7 @@ def solve(file_path,  # specify the mesh location
             solution.initialization.compute_defaults(from_zone_name=farfield_name)
             solution.initialization = {
                 'defaults': {
-                    'pressure': pressure,
+                    'pressure': gauge_pres,
                     'temperature': temperature,
                     'x-velocity': x_vel,
                     'y-velocity': y_vel

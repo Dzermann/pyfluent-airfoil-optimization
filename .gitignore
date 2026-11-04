@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+
+# Fluent session leftovers, written to the directory the scripts are run from
+fluent-*.trn
+fluent-*-error.log
+cleanup-fluent-*.bat
+pyfluent_watchdog.err
+FM_*/
+
+# Report files and their plots: Fluent writes them to the working directory and the
+# Main_File_* scripts copy them into each run's folder, leaving these behind
+/C_[dl]_*-rfile*.out
+/C_[dl]_*.png
+/src/C_[dl]_*-rfile*.out
+/src/C_[dl]_*.png
+
+# Excel lock file while sim_data.xlsx is open
+~$*.xlsx

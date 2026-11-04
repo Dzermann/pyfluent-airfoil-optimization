@@ -81,6 +81,7 @@ def optimize(
 ):
 
     logger = None
+    ssn = None
     try:  # importing stuff
         import math
         import os
@@ -725,8 +726,11 @@ def optimize(
                     ssn.mesh.repair_improve.improve_quality()
                     ad.design_tool.design_change.remesh()  
                      
-                    ad.design_tool.design_change.revert()
-                    print("PASS: Reverted to last acceptable mesh...")
+                    try:
+                        ad.design_tool.design_change.revert()
+                        print("PASS: Reverted to last acceptable mesh...")
+                    except Exception as e:  # revert can't undo a design change once the mesh has been remeshed
+                        print(f"WARNING: Could not revert the last design change ({e}). Continuing with the current mesh...")
 
                    
                     break
@@ -954,6 +958,7 @@ def optimize(
             while input('Shut down? Type y to continue').strip().casefold() != 'y': pass
 
         ssn.exit()  # shutting down
+        ssn = None
         logger.flush()
         print("PASS: Complete")
         print("PASS: Session closed")
@@ -962,6 +967,13 @@ def optimize(
 
 
     finally:
+
+        # close Fluent if something failed, so the next row can get the licence
+        if ssn is not None:
+            try:
+                ssn.exit()
+            except Exception:
+                pass
 
         # stopping the logger
         if logger is not None:

@@ -81,11 +81,12 @@ def optimize(
 ):
 
     logger = None
+    ssn = None
     try:  # importing stuff
         import math
         import os
         import time
-        from datetime import timedelta
+        from datetime import datetime, timedelta
         from pathlib import Path
 
         import ansys.fluent.core as pyfluent
@@ -243,26 +244,25 @@ def optimize(
 
         # %% Setting up the observables
         print("PASS: Adjoint solver active. Defining observables...")
+        # Fluent 2026 R1 groups the observables by type under 'definitions'
         ssn.settings.design.gradient_based.observables = {
             'named_expressions': {},
-            'definition': {
-                'drag': {
-                    'name': 'drag',  # define the drag observable
-                    'type': 'force',
-                    'walls': [upper_name, lower_name],  # select the zones
-                    'vector': [x_mach, y_mach, 0.0]  # vectors is based on aoa
+            'definitions': {
+                'force': {
+                    'drag': {  # define the drag observable
+                        'walls': [upper_name, lower_name],  # select the zones
+                        'vector': [x_mach, y_mach, 0.0]  # vectors is based on aoa
+                    },
+                    'lift': {  # define the lift observable
+                        'walls': [upper_name, lower_name],
+                        'vector': [-y_mach, x_mach, 0.0]
+                    }
                 },
-                'lift': {
-                    'name': 'lift',  # define the lift observable
-                    'type': 'force',
-                    'walls': [upper_name, lower_name],
-                    'vector': [-y_mach, x_mach, 0.0]
-                },
-                'lift-to-drag': {
-                    'name': 'lift-to-drag',  # define the lift-to-drag ratio
-                    'type': 'ratio',
-                    'numerator': 'lift',
-                    'denominator': 'drag'
+                'ratio': {
+                    'lift-to-drag': {  # define the lift-to-drag ratio
+                        'numerator': 'lift',
+                        'denominator': 'drag'
+                    }
                 }
             },
         }
@@ -481,8 +481,12 @@ def optimize(
 
 
         # %% initialize the drag and lift reports
+        # to avoid mixing up duplicate files (a rerun with the same nickname would
+        # otherwise pick up the previous run's report file)
+        timestamp = datetime.now().strftime('%M%S')
+
         # Initialize the drag report
-        report_1 = f"{report_1_name}_{airfoil}_{nickname}"
+        report_1 = f"{report_1_name}_{airfoil}_{nickname}_{timestamp}"
 
         solution.report_definitions.drag[f'{report_1}'] = {
             'force_vector': [x_mach, y_mach, 0],  # specify the force vector directions [x, y, z]
@@ -497,7 +501,7 @@ def optimize(
 
 
         # %% Initialize the lift report
-        report_2 = f"{report_2_name}_{airfoil}_{nickname}"
+        report_2 = f"{report_2_name}_{airfoil}_{nickname}_{timestamp}"
 
         solution.report_definitions.lift[f'{report_2}'] = {
             'force_vector': [-y_mach, x_mach, 0],
@@ -726,8 +730,11 @@ def optimize(
                     ssn.mesh.repair_improve.improve_quality()
                     ad.design_tool.design_change.remesh()  
                      
-                    ad.design_tool.design_change.revert()
-                    print("PASS: Reverted to last acceptable mesh...")
+                    try:
+                        ad.design_tool.design_change.revert()
+                        print("PASS: Reverted to last acceptable mesh...")
+                    except Exception as e:  # revert can't undo a design change once the mesh has been remeshed
+                        print(f"WARNING: Could not revert the last design change ({e}). Continuing with the current mesh...")
 
                    
                     break
@@ -955,6 +962,7 @@ def optimize(
             while input('Shut down? Type y to continue').strip().casefold() != 'y': pass
 
         ssn.exit()  # shutting down
+        ssn = None
         logger.flush()
         print("PASS: Complete")
         print("PASS: Session closed")
@@ -963,6 +971,13 @@ def optimize(
 
 
     finally:
+
+        # close Fluent if something failed, so the next row can get the licence
+        if ssn is not None:
+            try:
+                ssn.exit()
+            except Exception:
+                pass
 
         # stopping the logger
         if logger is not None:

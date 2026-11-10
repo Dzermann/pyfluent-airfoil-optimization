@@ -22,6 +22,7 @@ import pandas as pd
 from dachis_tools import (
     read_table,
     move_file,
+    move_report_file,
     save_inputs,
     plot_and_save_steady,
     plot_and_save_transient
@@ -76,8 +77,8 @@ for count, row in enumerate(table.itertuples(index=False), start=1):
 
         # all of these files are generated in the python directory
         # this function copies them to the correct folder
-        move_file(report_1_address, folder_path)
-        move_file(report_2_address, folder_path)
+        move_report_file(report_1_address, folder_path)
+        move_report_file(report_2_address, folder_path)
 
         for path in plot_paths:
             move_file(path, folder_path)

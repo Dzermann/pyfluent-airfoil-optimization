@@ -336,6 +336,15 @@ def move_file(source, destination):
     shutil.copy2(source, destination)
     print(f"PASS: {source} moved to {destination}")
 
+
+def move_report_file(source, destination):
+    """Copies a report file to folder, along with the <name>_<n>_<m>.out files
+    Fluent starts when the report restarts (e.g. after a re-initialization)"""
+    source = Path(source)
+    move_file(source, destination)
+    for variant in sorted(source.parent.glob(f"{source.stem}_*{source.suffix}")):
+        move_file(variant, destination)
+
 # %% Find results (without publishing)
 
 def find_results(paths: list[str], phrases: list[str], file_types: list[str], 

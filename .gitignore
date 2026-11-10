@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.venv/
+venv/
+env/
+
+# Editors / OS
+.vscode/
+.idea/
+.spyproject/
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Claude Code (local worktrees and settings)
+.claude/
+
+# Office lock / temp files (e.g. while sim_data.xlsx is open in Excel)
+~$*
+*.tmp
+
+# Fluent / Ansys run leftovers written to the working directory
+*.trn
+*.bak
+cleanup-fluent-*.bat
+fluent-*.log
+*.lock
+# report files Fluent writes next to the scripts before they're copied into a run folder
+/*.out
+/src/*.out
+
+# New simulation runs (large meshes, case/data files and hundreds of plots).
+# The curated examples already in example_files/ stay tracked; copy a run
+# into one of those folders and `git add -f` it if you want it on GitHub.
+example_files/final_*/
